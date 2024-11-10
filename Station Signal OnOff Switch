@@ -1,0 +1,43 @@
+-- Devices
+pole = component.proxy("1BD8BA4A402DA2793530CCBEC560F2D9")
+panel = component.proxy("DF74ADA549D4B8D3A4FC3A9365164AE2")
+station = component.proxy("123E560842D4A3ED8C392E834851391B")
+smallscreen = panel:getModule(5,9,0)
+debugscreen = panel:getModule(5,7,0)
+button1 = panel:getModule(0,10,0)
+button2 = panel:getModule(0,8,0)
+
+-- Testing Devices
+testswitch = panel:getModule(0,0,0)
+testlever = panel:getModule(1,0,0)
+
+-- Starting Conditions
+smallscreen.size = 60
+debugscreen.size = 45
+debugscreen.text = "Station:\nOSAKA Caterium"
+button1:setColor (0,1,0,0.1)
+button2:setColor (1,0,0,0.1)
+testswitch:setColor (0,1,0,0)
+
+
+
+-- Test Train Station Stuff
+print(station.name)
+
+
+-- Button Action
+event.listen(button1,button2,testswitch)
+
+while true do
+e, s = event.pull()
+
+if s == button1 then
+	pole:getObservedBlock().isPathBlock = false
+	smallscreen.size = 60
+	smallscreen.text = "PATH OPEN!"
+elseif s ==button2 then
+	pole:getObservedBlock().isPathBlock = true
+	smallscreen.size = 50
+	smallscreen.text = "PATH CLOSED!"
+	end
+end
