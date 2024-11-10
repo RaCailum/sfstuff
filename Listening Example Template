@@ -1,0 +1,16 @@
+-- Button Action
+event.listen(button1,button2,testswitch)
+
+while true do
+e, s = event.pull()
+
+if s == button1 then
+	pole:getObservedBlock().isPathBlock = false
+	smallscreen.size = 60
+	smallscreen.text = "PATH OPEN!"
+elseif s ==button2 then
+	pole:getObservedBlock().isPathBlock = true
+	smallscreen.size = 50
+	smallscreen.text = "PATH CLOSED!"
+	end
+end
