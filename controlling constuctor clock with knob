@@ -1,0 +1,41 @@
+-- Devices
+const1 = component.proxy("4CE31DC146F901F3F3D7B09D3E8CA549")
+panel = component.proxy("3DA7AEAC4564574EDEFEB79CB54EE168")
+smallscreen = panel:getModule(0,9,0)
+potent = panel:getModule(4,9,0)
+smalllcd = panel:getModule(6,10,0)
+gauge = panel:getModule(7,9,0)
+
+event.listen(potent)
+e, s = event.pull()
+
+
+while true do
+
+-- Variables
+OC = potent.value
+
+
+-- DEBUG
+print(OC)
+print(const1.potential)
+
+-- Constructor Clock
+const1:setPotential(OC/100)
+
+-- Knob
+potent.min = 1
+potent.max = 250
+
+-- Screen Conditions
+smallscreen.size = 54
+smallscreen.text = "Clocked State:\n         " .. OC .. "%"
+
+-- LCD Screen
+smalllcd:setText(OC.."%")
+
+-- Gauge
+gauge.limit = .9
+gauge.percent = OC / 250
+
+end
