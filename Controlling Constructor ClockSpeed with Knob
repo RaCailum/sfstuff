@@ -1,24 +1,26 @@
--- Devices
-const1 = component.proxy("4CE31DC146F901F3F3D7B09D3E8CA549")
-panel = component.proxy("3DA7AEAC4564574EDEFEB79CB54EE168")
-smallscreen = panel:getModule(0,9,0)
-potent = panel:getModule(4,9,0)
-smalllcd = panel:getModule(6,10,0)
-gauge = panel:getModule(7,9,0)
+local const1 = component.proxy("4CE31DC146F901F3F3D7B09D3E8CA549")
+local speaker = component.proxy("A0D72C3C4E083E954F8AE2A534995547"
 
-event.listen(potent)
-e, s = event.pull()
+-- Panel 1
+local panel = component.proxy("A74C3949447C80D66084FCB9441854A5")
+local potent = panel:getModule(0, 0)
+local smalllcd = panel:getModule(1, 0)
+local gauge = panel:getModule(2, 2)
+local switch = panel:getModule(0, 1)
 
+event.listen(potent,switch)
+e, s = event.pull(0)
 
 while true do
 
 -- Variables
 OC = potent.value
 
-
 -- DEBUG
-print(OC)
-print(const1.potential)
+-- print(OC)
+-- print(const1.potential)
+-- e, s = event.pull()
+-- print(e, s)
 
 -- Constructor Clock
 const1:setPotential(OC/100)
@@ -26,16 +28,23 @@ const1:setPotential(OC/100)
 -- Knob
 potent.min = 1
 potent.max = 250
+potent:setColor (0,1,0,.5)
 
--- Screen Conditions
-smallscreen.size = 54
-smallscreen.text = "Clocked State:\n         " .. OC .. "%"
+-- Switch
+if switch.state == false then
+const1.standby = true
+else
+const1.standby = false
+end
 
 -- LCD Screen
 smalllcd:setText(OC.."%")
 
 -- Gauge
-gauge.limit = .9
+gauge:setColor (.25,.25,1,0)
+gauge:setBackgroundColor (1,1,1,0)
+gauge.limit = .4
 gauge.percent = OC / 250
+
 
 end
