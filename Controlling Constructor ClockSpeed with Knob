@@ -1,5 +1,4 @@
 local const1 = component.proxy("4CE31DC146F901F3F3D7B09D3E8CA549")
-local speaker = component.proxy("A0D72C3C4E083E954F8AE2A534995547"
 
 -- Panel 1
 local panel = component.proxy("A74C3949447C80D66084FCB9441854A5")
@@ -8,24 +7,22 @@ local smalllcd = panel:getModule(1, 0)
 local gauge = panel:getModule(2, 2)
 local switch = panel:getModule(0, 1)
 
-event.listen(potent,switch)
-e, s = event.pull(0)
-
 while true do
 
 -- Variables
 OC = potent.value
 
+
 -- DEBUG
--- print(OC)
--- print(const1.potential)
--- e, s = event.pull()
--- print(e, s)
+--event.listen()
+--e, s = event.pull(0)
+--print(event.pull())
+--print(e, s)
 
 -- Constructor Clock
 const1:setPotential(OC/100)
 
--- Knob
+-- OC Knob
 potent.min = 1
 potent.max = 250
 potent:setColor (0,1,0,.5)
@@ -37,14 +34,15 @@ else
 const1.standby = false
 end
 
+
 -- LCD Screen
 smalllcd:setText(OC.."%")
+smalllcd:setColor((1 - (OC -1) / 99),((OC -1)/99),0,.5)
 
--- Gauge
-gauge:setColor (.25,.25,1,0)
+-- Constructor Gauge
+gauge:setColor (.9,.3,.9,.5)
 gauge:setBackgroundColor (1,1,1,0)
 gauge.limit = .4
 gauge.percent = OC / 250
-
 
 end
