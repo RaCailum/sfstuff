@@ -252,6 +252,11 @@ local si2_16clock = panel4:getModule(0,0,0)
 
 
 -- Default Variables, Control Names
+si1_1nametag:setText("si1_1")
+si1_2nametag:setText("si1_2")
+si1_3nametag:setText("si1_3")
+si1_4nametag:setText("si1_4")
+
 si1_5nametag:setText("si1_5")
 si1_6nametag:setText("si1_6")
 si1_7nametag:setText("si1_7")
