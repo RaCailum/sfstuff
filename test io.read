@@ -1,0 +1,29 @@
+score = 0
+
+print("Question 1: What is 10 + 5")
+answer1 = io.read()
+
+print("\nYour Answer: " .. answer1)
+
+
+if answer1 == "15" then
+    score = score+1
+    print("\nThat is correct! \nThat's +1 Point \n\nTotal Points: " .. score)
+    
+else
+    print("That is not correct :(")
+    print("Total Points:" .. score)
+end
+
+print("\n\n\nQuestion 2: What color is an Apple?")
+answer2 = io.read()
+
+if answer2 == "red" or "Red" then
+    score = score+1
+    print("\nThat is correct! \nThat's +1 Point \n\nTotal Points: " .. score)
+    
+else
+    print("That is not correct :(")
+    print("Total Points:" .. score)
+end
+
