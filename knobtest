@@ -1,7 +1,7 @@
 -- knob test
 
 knobdeviceoutput = 30
-multiplier = "/100 * 3.3333"
+multiplier = "(100 * 3.3333333)"
     
 -- Button Action
 event.listen(knob1_1, knob1_2, knob1_3, knob1_4, knob1_5, knob1_6, knob1_7, knob1_8, knob1_9, knob1_10, knob1_11, knob1_12, knob1_13, knob1_14, knob1_15, knob1_16, knob2_1, knob2_2, knob2_3, knob2_4, knob2_5, knob2_6, knob2_7, knob2_8, knob2_9, knob2_10, knob2_11, knob2_12, knob2_13, knob2_14, knob2_15, knob2_16
@@ -12,99 +12,99 @@ while true do
 
     if s == knob1_1 then
         knobdeviceoutput = si1_1knob.value
-        si1_1.productivity = knobdeviceoutput x multiplier
+        si1_1.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_2 then
         knobdeviceoutput = si1_2knob.value
-        si1_2.productivity = knobdeviceoutput x multiplier
+        si1_2.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_3 then
         knobdeviceoutput = si1_3knob.value
-        si1_3.productivity = knobdeviceoutput x multiplier
+        si1_3.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_4 then
         knobdeviceoutput = si1_4knob.value
-        si1_4.productivity = knobdeviceoutput x multiplier
+        si1_4.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_5 then
         knobdeviceoutput = si1_5knob.value
-        si1_5.productivity = knobdeviceoutput x multiplier
+        si1_5.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_6 then
         knobdeviceoutput = si1_6knob.value
-        si1_6.productivity = knobdeviceoutput x multiplier
+        si1_6.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_7 then
         knobdeviceoutput = si1_7knob.value
-        si1_7.productivity = knobdeviceoutput x multiplier
+        si1_7.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_8 then
         knobdeviceoutput = si1_8knob.value
-        si1_8.productivity = knobdeviceoutput x multiplier
+        si1_8.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_9 then
         knobdeviceoutput = si1_9knob.value
-        si1_9.productivity = knobdeviceoutput x multiplier
+        si1_9.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_10 then
         knobdeviceoutput = si1_10knob.value
-        si1_10.productivity = knobdeviceoutput x multiplier
+        si1_10.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_11 then
         knobdeviceoutput = si1_11knob.value
-        si1_11.productivity = knobdeviceoutput x multiplier
+        si1_11.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_12 then
         knobdeviceoutput = si1_12knob.value
-        si1_12.productivity = knobdeviceoutput x multiplier
+        si1_12.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_13 then
         knobdeviceoutput = si1_13knob.value
-        si1_13.productivity = knobdeviceoutput x multiplier
+        si1_13.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_14 then
         knobdeviceoutput = si1_14knob.value
-        si1_14.productivity = knobdeviceoutput x multiplier
+        si1_14.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_15 then
         knobdeviceoutput = si1_15knob.value
-        si1_15.productivity = knobdeviceoutput x multiplier
+        si1_15.productivity = knobdeviceoutput / multiplier
     elseif s == knob1_16 then
         knobdeviceoutput = si1_16knob.value
-        si1_16.productivity = knobdeviceoutput x multiplier
+        si1_16.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_1 then
         knobdeviceoutput = si2_1knob.value
-        si2_1.productivity = knobdeviceoutput x multiplier
+        si2_1.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_2 then
         knobdeviceoutput = si2_2knob.value
-        si2_2.productivity = knobdeviceoutput x multiplier
+        si2_2.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_3 then
         knobdeviceoutput = si2_3knob.value
-        si2_3.productivity = knobdeviceoutput x multiplier
+        si2_3.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_4 then
         knobdeviceoutput = si2_4knob.value
-        si2_4.productivity = knobdeviceoutput x multiplier
+        si2_4.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_5 then
         knobdeviceoutput = si2_5knob.value
-        si2_5.productivity = knobdeviceoutput x multiplier
+        si2_5.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_6 then
         knobdeviceoutput = si2_6knob.value
-        si2_6.productivity = knobdeviceoutput x multiplier
+        si2_6.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_7 then
         knobdeviceoutput = si2_7knob.value
-        si2_7.productivity = knobdeviceoutput x multiplier
+        si2_7.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_8 then
         knobdeviceoutput = si2_8knob.value
-        si2_8.productivity = knobdeviceoutput x multiplier
+        si2_8.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_9 then
         knobdeviceoutput = si2_9knob.value
-        si2_9.productivity = knobdeviceoutput x multiplier
+        si2_9.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_10 then
         knobdeviceoutput = si2_10knob.value
-        si2_10.productivity = knobdeviceoutput x multiplier
+        si2_10.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_11 then
         knobdeviceoutput = si2_11knob.value
-        si2_11.productivity = knobdeviceoutput x multiplier
+        si2_11.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_12 then
         knobdeviceoutput = si2_12knob.value
-        si2_12.productivity = knobdeviceoutput x multiplier
+        si2_12.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_13 then
         knobdeviceoutput = si2_13knob.value
-        si2_13.productivity = knobdeviceoutput x multiplier
+        si2_13.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_14 then
         knobdeviceoutput = si2_14knob.value
-        si2_14.productivity = knobdeviceoutput x multiplier
+        si2_14.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_15 then
         knobdeviceoutput = si2_15knob.value
-        si2_15.productivity = knobdeviceoutput x multiplier
+        si2_15.productivity = knobdeviceoutput / multiplier
     elseif s == knob2_16 then
         knobdeviceoutput = si2_16knob.value
-        si2_16.productivity = knobdeviceoutput x multiplier
+        si2_16.productivity = knobdeviceoutput / multiplier
     end
 end
