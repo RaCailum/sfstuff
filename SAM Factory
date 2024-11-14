@@ -1,257 +1,251 @@
 -- CONTROL PANELS
+panelmicro1 = component.proxy("870683C1443028EB4CA774834EF2C05D")
 panel1 = component.proxy("2ED482AB43475B22B330388EC00A7E1B")
 panel2 = component.proxy("B12C0BC949471FE48DEB1AA596ADD9CE")
 panel3 = component.proxy("84364CD846354ED3D416E6ADD4535457")
 panel4 = component.proxy("81702C594F27314005794A829E6D27F6")
 
+-- MICRO PANEL CONTROLS 
+
+
 -- IRON SMELTERS
--- SMELTERS ROW 1
-local si1_1 = component.proxy("9A45FF494C1F055C17B2558BB31B5034")
-local si1_2 = component.proxy("F7B3D48A4917C5BE144C8AA4B62C2CB1")
-local si1_3 = component.proxy("DFE3AF5A496BDA89BC64859585A20557")
-local si1_4 = component.proxy("BACBD86C4B679D7CEE3C399BA327412E")
-local si1_5 = component.proxy("50249E41429E1BBE8BCB548039DFAC6D")
-local si1_6 = component.proxy("214502AF40E83485FAD8AE9F95C7970F")
-local si1_7 = component.proxy("A9EC20F9484F75B509665790101CD135")
-local si1_8 = component.proxy("E333EE4945B369AEBA6ED689250D77DA")
-local si1_9 = component.proxy("C7A4E5C14A5E4882C18E8781158284F6")
-local si1_10 = component.proxy("26395DE04A8B61B9745BEF8D684FAFAE")
-local si1_11 = component.proxy("F914ABB34C952A3F1DCD4586232A3228")
-local si1_12 = component.proxy("383554D34F9EFA4A0BADAFB3166FAD85")
-local si1_13 = component.proxy("2B30B23D4C473D039A9AA28A5E364558")
-local si1_14 = component.proxy("52181BFD4F17C72F9602AC9B7807F3E5")
-local si1_15 = component.proxy("BBE7DDD0475955FC749E328A3DA5C9B2")
-local si1_16 = component.proxy("58D6180E46C95B4AF16C97AB3C5B9346")
-
--- SMELTERS ROW 2
-local si2_1 = component.proxy("15814AF1404B78597951D392BD144C6B")
-local si2_2 = component.proxy("3CF0DC164DF2EE57594285B32DE9262F")
-local si2_3 = component.proxy("1DF82CF9492E74166F75CF92031F35B6")
-local si2_4 = component.proxy("29F80CE046E4657FE46F1A8542DCDB55")
-local si2_5 = component.proxy("6431BC8F49C10C1C041CF6984B265236") 
-local si2_6 = component.proxy("9B245A9148E2CAF0C162FA9E21A40FEA")
-local si2_7 = component.proxy("26DF62B84E1ACEBA7A6E24AB2C355880")
-local si2_8 = component.proxy("23FBDEF54359B61214F333A4EE664FCF")
-local si2_9 = component.proxy("FB74C8F342F9D604C5987CA9B705F9C2")
-local si2_10 = component.proxy("73D16F57483526811C451CBF1C98940B")
-local si2_11 = component.proxy("AA5BED7F430E1782B4CCFBA3AD0B772C")
-local si2_12 = component.proxy("834597054957DF2CE5DCA18BDB89371C")
-local si2_13 = component.proxy("7E3F2E6B440E337F1D149798B477C43C")
-local si2_14 = component.proxy("3F2ACCBA4D45071ADF0CB498F7278910")
-local si2_15 = component.proxy("9F34E18C475653365A49079B9542A042")
-local si2_16 = component.proxy("24591321487C75BD5D8AAB90C2EFAAFA")
-
--- CONTROL PANELS
---PANEL 1 - ROW 1 1-4
-local si1_1knob = panel1:getModule(0,0,0)
-local si1_1switch = panel1:getModule(0,0,0)
-local si1_1gauge = panel1:getModule(0,1,0)
-local si1_1nametag = panel1:getModule(0,4,0)
-local si1_1clock = panel1:getModule(0,3,0)
-
-local si1_2knob = panel1:getModule(0,0,0)
-local si1_2switch = panel1:getModule(0,0,0)
-local si1_2gauge = panel1:getModule(3,1,0)
-local si1_2nametag = panel1:getModule(3,4,0)
-local si1_2clock = panel1:getModule(3,3,0)
-
-local si1_3knob = panel1:getModule(0,0,0)
-local si1_3switch = panel1:getModule(0,0,0)
-local si1_3gauge = panel1:getModule(6,1,0)
-local si1_3nametag = panel1:getModule(6,4,0)
-local si1_3clock = panel1:getModule(6,3,0)
-
-local si1_4knob = panel1:getModule(0,0,0)
-local si1_4switch = panel1:getModule(0,0,0)
-local si1_4gauge = panel1:getModule(9,1,0)
-local si1_4nametag = panel1:getModule(9,4,0)
-local si1_4clock = panel1:getModule(9,3,0)
-
---PANEL 2 - ROW 1 5-8
-
-local si1_5knob = panel2:getModule(0,0,0)
-local si1_5switch = panel2:getModule(0,0,0)
-local si1_5gauge = panel2:getModule(0,0,0)
-local si1_5nametag = panel2:getModule(0,4,0)
-local si1_5clock = panel2:getModule(0,0,0)
-
-local si1_6knob = panel2:getModule(0,0,0)
-local si1_6switch = panel2:getModule(0,0,0)
-local si1_6gauge = panel2:getModule(0,0,0)
-local si1_6nametag = panel2:getModule(3,4,0)
-local si1_6clock = panel2:getModule(0,0,0)
-
-local si1_7knob = panel2:getModule(0,0,0)
-local si1_7switch = panel2:getModule(0,0,0)
-local si1_7gauge = panel2:getModule(0,0,0)
-local si1_7nametag = panel2:getModule(6,4,0)
-local si1_7clock = panel2:getModule(0,0,0)
-
-local si1_8knob = panel2:getModule(0,0,0)
-local si1_8switch = panel2:getModule(0,0,0)
-local si1_8gauge = panel2:getModule(0,0,0)
-local si1_8nametag = panel2:getModule(9,4,0)
-local si1_8clock = panel2:getModule(0,0,0)
-
---PANEL 3 - ROW 1 9-12
-
-local si1_9knob = panel3:getModule(0,0,0)
-local si1_9switch = panel3:getModule(0,0,0)
-local si1_9gauge = panel3:getModule(0,0,0)
-local si1_9nametag = panel3:getModule(0,4,0)
-local si1_9clock = panel3:getModule(0,0,0)
-
-local si1_10knob = panel3:getModule(0,0,0)
-local si1_10switch = panel3:getModule(0,0,0)
-local si1_10gauge = panel3:getModule(0,0,0)
-local si1_10nametag = panel3:getModule(3,4,0)
-local si1_10clock = panel3:getModule(0,0,0)
-
-local si1_11knob = panel3:getModule(0,0,0)
-local si1_11switch = panel3:getModule(0,0,0)
-local si1_11gauge = panel3:getModule(0,0,0)
-local si1_11nametag = panel3:getModule(6,4,0)
-local si1_11clock = panel3:getModule(9,4,0)
-
-local si1_12knob = panel3:getModule(0,0,0)
-local si1_12switch = panel3:getModule(0,0,0)
-local si1_12gauge = panel3:getModule(0,0,0)
-local si1_12nametag = panel3:getModule(9,4,0)
-local si1_12clock = panel3:getModule(0,0,0)
-
---PANEL 4 - ROW 1 13-16
-local si1_13knob = panel4:getModule(0,0,0)
-local si1_13switch = panel4:getModule(0,0,0)
-local si1_13gauge = panel4:getModule(0,0,0)
-local si1_13nametag = panel4:getModule(0,4,0)
-local si1_13clock = panel4:getModule(0,0,0)
-
-local si1_14knob = panel4:getModule(0,0,0)
-local si1_14switch = panel4:getModule(0,0,0)
-local si1_14gauge = panel4:getModule(0,0,0)
-local si1_14nametag = panel4:getModule(3,4,0)
-local si1_14clock = panel4:getModule(0,0,0)
-
-local si1_15knob = panel4:getModule(0,0,0)
-local si1_15switch = panel4:getModule(0,0,0)
-local si1_15gauge = panel4:getModule(0,0,0)
-local si1_15nametag = panel4:getModule(6,4,0)
-local si1_15clock = panel4:getModule(0,0,0)
-
-local si1_16knob = panel4:getModule(0,0,0)
-local si1_16switch = panel4:getModule(0,0,0)
-local si1_16gauge = panel4:getModule(0,0,0)
-local si1_16nametag = panel4:getModule(9,4,0)
-local si1_16clock = panel4:getModule(0,0,0)
-
---PANEL 1 - ROW 2 1-4
-local si2_1knob = panel1:getModule(0,0,0)
-local si2_1switch = panel1:getModule(0,0,0)
-local si2_1gauge = panel1:getModule(0,0,0)
-local si2_1nametag = panel1:getModule(0,10,0)
-local si2_1clock = panel1:getModule(0,0,0)
-
-local si2_2knob = panel1:getModule(0,0,0)
-local si2_2switch = panel1:getModule(0,0,0)
-local si2_2gauge = panel1:getModule(0,0,0)
-local si2_2nametag = panel1:getModule(3,10,0)
-local si2_2clock = panel1:getModule(0,0,0)
-
-local si2_3knob = panel1:getModule(0,0,0)
-local si2_3switch = panel1:getModule(0,0,0)
-local si2_3gauge = panel1:getModule(0,0,0)
-local si2_3nametag = panel1:getModule(6,10,0)
-local si2_3clock = panel1:getModule(0,0,0)
-
-local si2_4knob = panel1:getModule(0,0,0)
-local si2_4switch = panel1:getModule(0,0,0)
-local si2_4gauge = panel1:getModule(0,0,0)
-local si2_4nametag = panel1:getModule(9,10,0)
-local si2_4clock = panel1:getModule(0,0,0)
-
---PANEL 2 - ROW 2 5-8
-
-local si2_5knob = panel2:getModule(0,0,0)
-local si2_5switch = panel2:getModule(0,0,0)
-local si2_5gauge = panel2:getModule(0,0,0)
-local si2_5nametag = panel2:getModule(0,10,0)
-local si2_5clock = panel2:getModule(0,0,0)
-
-local si2_6knob = panel2:getModule(0,0,0)
-local si2_6switch = panel2:getModule(0,0,0)
-local si2_6gauge = panel2:getModule(0,0,0)
-local si2_6nametag = panel2:getModule(3,10,0)
-local si2_6clock = panel2:getModule(0,0,0)
-
-local si2_7knob = panel2:getModule(0,0,0)
-local si2_7switch = panel2:getModule(0,0,0)
-local si2_7gauge = panel2:getModule(0,0,0)
-local si2_7nametag = panel2:getModule(6,10,0)
-local si2_7clock = panel2:getModule(0,0,0)
-
-local si2_8knob = panel2:getModule(0,0,0)
-local si2_8switch = panel2:getModule(0,0,0)
-local si2_8gauge = panel2:getModule(0,0,0)
-local si2_8nametag = panel2:getModule(9,10,0)
-local si2_8clock = panel2:getModule(0,0,0)
-
---PANEL 3 - ROW 2 9-12
-
-local si2_9knob = panel3:getModule(0,0,0)
-local si2_9switch = panel3:getModule(0,0,0)
-local si2_9gauge = panel3:getModule(0,0,0)
-local si2_9nametag = panel3:getModule(0,10,0)
-local si2_9clock = panel3:getModule(0,0,0)
-
-local si2_10knob = panel3:getModule(0,0,0)
-local si2_10switch = panel3:getModule(0,0,0)
-local si2_10gauge = panel3:getModule(0,0,0)
-local si2_10nametag = panel3:getModule(3,10,0)
-local si2_10clock = panel3:getModule(0,0,0)
-
-local si2_11knob = panel3:getModule(0,0,0)
-local si2_11switch = panel3:getModule(0,0,0)
-local si2_11gauge = panel3:getModule(0,0,0)
-local si2_11nametag = panel3:getModule(6,10,0)
-local si2_11clock = panel3:getModule(0,0,0)
-
-local si2_12knob = panel3:getModule(0,0,0)
-local si2_12switch = panel3:getModule(0,0,0)
-local si2_12gauge = panel3:getModule(0,0,0)
-local si2_12nametag = panel3:getModule(9,10,0)
-local si2_12clock = panel3:getModule(0,0,0)
-
---PANEL 4 - ROW 2 13-16
-
-local si2_13knob = panel4:getModule(0,0,0)
-local si2_13switch = panel4:getModule(0,0,0)
-local si2_13gauge = panel4:getModule(0,0,0)
-local si2_13nametag = panel4:getModule(0,10,0)
-local si2_13clock = panel4:getModule(0,0,0)
-
-local si2_14knob = panel4:getModule(0,0,0)
-local si2_14switch = panel4:getModule(0,0,0)
-local si2_14gauge = panel4:getModule(0,0,0)
-local si2_14nametag = panel4:getModule(3,10,0)
-local si2_14clock = panel4:getModule(0,0,0)
-
-local si2_15knob = panel4:getModule(0,0,0)
-local si2_15switch = panel4:getModule(0,0,0)
-local si2_15gauge = panel4:getModule(0,0,0)
-local si2_15nametag = panel4:getModule(6,10,0)
-local si2_15clock = panel4:getModule(0,0,0)
-
-local si2_16knob = panel4:getModule(0,0,0)
-local si2_16switch = panel4:getModule(0,0,0)
-local si2_16gauge = panel4:getModule(0,0,0)
-local si2_16nametag = panel4:getModule(9,10,0)
-local si2_16clock = panel4:getModule(0,0,0)
+si1_1 = component.proxy("9A45FF494C1F055C17B2558BB31B5034")
+si1_2 = component.proxy("F7B3D48A4917C5BE144C8AA4B62C2CB1")
+si1_3 = component.proxy("DFE3AF5A496BDA89BC64859585A20557")
+si1_4 = component.proxy("BACBD86C4B679D7CEE3C399BA327412E")
+si1_5 = component.proxy("50249E41429E1BBE8BCB548039DFAC6D")
+si1_6 = component.proxy("214502AF40E83485FAD8AE9F95C7970F")
+si1_7 = component.proxy("A9EC20F9484F75B509665790101CD135")
+si1_8 = component.proxy("E333EE4945B369AEBA6ED689250D77DA")
+si1_9 = component.proxy("C7A4E5C14A5E4882C18E8781158284F6")
+si1_10 = component.proxy("26395DE04A8B61B9745BEF8D684FAFAE")
+si1_11 = component.proxy("F914ABB34C952A3F1DCD4586232A3228")
+si1_12 = component.proxy("383554D34F9EFA4A0BADAFB3166FAD85")
+si1_13 = component.proxy("2B30B23D4C473D039A9AA28A5E364558")
+si1_14 = component.proxy("52181BFD4F17C72F9602AC9B7807F3E5")
+si1_15 = component.proxy("BBE7DDD0475955FC749E328A3DA5C9B2")
+si1_16 = component.proxy("58D6180E46C95B4AF16C97AB3C5B9346")
+si2_1 = component.proxy("15814AF1404B78597951D392BD144C6B")
+si2_2 = component.proxy("3CF0DC164DF2EE57594285B32DE9262F")
+si2_3 = component.proxy("1DF82CF9492E74166F75CF92031F35B6")
+si2_4 = component.proxy("29F80CE046E4657FE46F1A8542DCDB55")
+si2_5 = component.proxy("6431BC8F49C10C1C041CF6984B265236") 
+si2_6 = component.proxy("9B245A9148E2CAF0C162FA9E21A40FEA")
+si2_7 = component.proxy("26DF62B84E1ACEBA7A6E24AB2C355880")
+si2_8 = component.proxy("23FBDEF54359B61214F333A4EE664FCF")
+si2_9 = component.proxy("FB74C8F342F9D604C5987CA9B705F9C2")
+si2_10 = component.proxy("73D16F57483526811C451CBF1C98940B")
+si2_11 = component.proxy("AA5BED7F430E1782B4CCFBA3AD0B772C")
+si2_12 = component.proxy("834597054957DF2CE5DCA18BDB89371C")
+si2_13 = component.proxy("7E3F2E6B440E337F1D149798B477C43C")
+si2_14 = component.proxy("3F2ACCBA4D45071ADF0CB498F7278910")
+si2_15 = component.proxy("9F34E18C475653365A49079B9542A042")
+si2_16 = component.proxy("24591321487C75BD5D8AAB90C2EFAAFA")
 
 
 
+-- CONTROL PANEL BUTTONS
+si1_1knob = panel1:getModule(0,0,0)
+si1_1gauge = panel1:getModule(0,1,0)
+si1_1nametag = panel1:getModule(0,4,0)
+si1_1clock = panel1:getModule(0,3,0)
+si1_1micro = panel1:getModule(1,0,0)
+
+si1_2knob = panel1:getModule(3,0,0)
+si1_2gauge = panel1:getModule(3,1,0)
+si1_2nametag = panel1:getModule(3,4,0)
+si1_2clock = panel1:getModule(3,3,0)
+si1_2micro = panel1:getModule(4,0,0)
+
+si1_3knob = panel1:getModule(6,0,0)
+si1_3gauge = panel1:getModule(6,1,0)
+si1_3nametag = panel1:getModule(6,4,0)
+si1_3clock = panel1:getModule(6,3,0)
+si1_3micro = panel1:getModule(7,0,0)
+
+si1_4knob = panel1:getModule(9,0,0)
+si1_4gauge = panel1:getModule(9,1,0)
+si1_4nametag = panel1:getModule(9,4,0)
+si1_4clock = panel1:getModule(9,3,0)
+si1_4micro = panel1:getModule(10,0,0)
+
+si1_5knob = panel2:getModule(0,0,0)
+si1_5gauge = panel2:getModule(0,1,0)
+si1_5nametag = panel2:getModule(0,4,0)
+si1_5clock = panel2:getModule(0,3,0)
+si1_5micro = panel2:getModule(1,0,0)
+
+si1_6knob = panel2:getModule(3,0,0)
+si1_6gauge = panel2:getModule(3,1,0)
+si1_6nametag = panel2:getModule(3,4,0)
+si1_6clock = panel2:getModule(3,3,0)
+si1_6micro = panel2:getModule(4,0,0)
+
+si1_7knob = panel2:getModule(6,0,0)
+si1_7gauge = panel2:getModule(6,1,0)
+si1_7nametag = panel2:getModule(6,4,0)
+si1_7clock = panel2:getModule(6,3,0)
+si1_7micro = panel2:getModule(7,0,0)
+
+si1_8knob = panel2:getModule(9,0,0)
+si1_8gauge = panel2:getModule(9,1,0)
+si1_8nametag = panel2:getModule(9,4,0)
+si1_8clock = panel2:getModule(9,3,0)
+si1_8micro = panel2:getModule(10,0,0)
+
+si1_9knob = panel3:getModule(0,0,0)
+si1_9gauge = panel3:getModule(0,1,0)
+si1_9nametag = panel3:getModule(0,4,0)
+si1_9clock = panel3:getModule(0,3,0)
+si1_9micro = panel3:getModule(1,0,0)
+
+si1_10knob = panel3:getModule(3,0,0)
+si1_10gauge = panel3:getModule(3,1,0)
+si1_10nametag = panel3:getModule(3,4,0)
+si1_10clock = panel3:getModule(3,3,0)
+si1_10micro = panel3:getModule(4,0,0)
+
+si1_11knob = panel3:getModule(6,0,0)
+si1_11gauge = panel3:getModule(6,1,0)
+si1_11nametag = panel3:getModule(6,4,0)
+si1_11clock = panel3:getModule(6,3,0)
+si1_11micro = panel3:getModule(7,0,0)
+
+si1_12knob = panel3:getModule(9,0,0)
+si1_12gauge = panel3:getModule(9,1,0)
+si1_12nametag = panel3:getModule(9,4,0)
+si1_12clock = panel3:getModule(9,3,0)
+si1_12micro = panel3:getModule(10,0,0)
+
+si1_13knob = panel4:getModule(0,0,0)
+si1_13gauge = panel4:getModule(0,1,0)
+si1_13nametag = panel4:getModule(0,4,0)
+si1_13clock = panel4:getModule(0,3,0)
+si1_13micro = panel4:getModule(1,0,0)
+
+si1_14knob = panel4:getModule(3,0,0)
+si1_14gauge = panel4:getModule(3,1,0)
+si1_14nametag = panel4:getModule(3,4,0)
+si1_14clock = panel4:getModule(3,3,0)
+si1_14micro = panel4:getModule(4,0,0)
+
+si1_15knob = panel4:getModule(6,0,0)
+si1_15gauge = panel4:getModule(6,1,0)
+si1_15nametag = panel4:getModule(6,4,0)
+si1_15clock = panel4:getModule(6,3,0)
+si1_15micro = panel4:getModule(7,0,0)
+
+si1_16knob = panel4:getModule(9,0,0)
+si1_16gauge = panel4:getModule(9,1,0)
+si1_16nametag = panel4:getModule(9,4,0)
+si1_16clock = panel4:getModule(9,3,0)
+si1_16micro = panel4:getModule(10,0,0)
+
+si2_1knob = panel1:getModule(0,6,0)
+si2_1gauge = panel1:getModule(0,7,0)
+si2_1nametag = panel1:getModule(0,10,0)
+si2_1clock = panel1:getModule(0,9,0)
+si2_1micro = panel1:getModule(1,6,0)
+
+si2_2knob = panel1:getModule(3,6,0)
+si2_2gauge = panel1:getModule(3,7,0)
+si2_2nametag = panel1:getModule(3,10,0)
+si2_2clock = panel1:getModule(3,9,0)
+si2_2micro = panel1:getModule(4,6,0)
+
+si2_3knob = panel1:getModule(6,6,0)
+si2_3gauge = panel1:getModule(6,7,0)
+si2_3nametag = panel1:getModule(6,10,0)
+si2_3clock = panel1:getModule(6,9,0)
+si2_3micro = panel1:getModule(7,6,0)
+
+si2_4knob = panel1:getModule(9,6,0)
+si2_4gauge = panel1:getModule(9,7,0)
+si2_4nametag = panel1:getModule(9,10,0)
+si2_4clock = panel1:getModule(9,9,0)
+si2_4micro = panel1:getModule(10,6,0)
+
+si2_5knob = panel2:getModule(0,6,0)
+si2_5gauge = panel2:getModule(0,7,0)
+si2_5nametag = panel2:getModule(0,10,0)
+si2_5clock = panel2:getModule(0,9,0)
+si2_5micro = panel2:getModule(1,6,0)
+
+si2_6knob = panel2:getModule(3,6,0)
+si2_6gauge = panel2:getModule(3,7,0)
+si2_6nametag = panel2:getModule(3,10,0)
+si2_6clock = panel2:getModule(3,9,0)
+si2_6micro = panel2:getModule(4,6,0)
+
+si2_7knob = panel2:getModule(6,6,0)
+si2_7gauge = panel2:getModule(6,7,0)
+si2_7nametag = panel2:getModule(6,10,0)
+si2_7clock = panel2:getModule(6,9,0)
+si2_7micro = panel2:getModule(7,6,0)
+
+si2_8knob = panel2:getModule(9,6,0)
+si2_8gauge = panel2:getModule(9,7,0)
+si2_8nametag = panel2:getModule(9,10,0)
+si2_8clock = panel2:getModule(9,9,0)
+si2_8micro = panel2:getModule(10,6,0)
+
+si2_9knob = panel3:getModule(0,6,0)
+si2_9gauge = panel3:getModule(0,7,0)
+si2_9nametag = panel3:getModule(0,10,0)
+si2_9clock = panel3:getModule(0,9,0)
+si2_9micro = panel3:getModule(1,6,0)
+
+si2_10knob = panel3:getModule(3,6,0)
+si2_10gauge = panel3:getModule(3,7,0)
+si2_10nametag = panel3:getModule(3,10,0)
+si2_10clock = panel3:getModule(3,9,0)
+si2_10micro = panel3:getModule(4,6,0)
+
+si2_11knob = panel3:getModule(6,6,0)
+si2_11gauge = panel3:getModule(6,7,0)
+si2_11nametag = panel3:getModule(6,10,0)
+si2_11clock = panel3:getModule(6,9,0)
+si2_11micro = panel3:getModule(7,6,0)
+
+si2_12knob = panel3:getModule(9,6,0)
+si2_12gauge = panel3:getModule(9,7,0)
+si2_12nametag = panel3:getModule(9,10,0)
+si2_12clock = panel3:getModule(9,9,0)
+si2_12micro = panel3:getModule(10,6,0)
+
+si2_13knob = panel4:getModule(0,6,0)
+si2_13gauge = panel4:getModule(0,7,0)
+si2_13nametag = panel4:getModule(0,10,0)
+si2_13clock = panel4:getModule(0,9,0)
+si2_13micro = panel4:getModule(1,6,0)
+
+si2_14knob = panel4:getModule(3,6,0)
+si2_14gauge = panel4:getModule(3,7,0)
+si2_14nametag = panel4:getModule(3,10,0)
+si2_14clock = panel4:getModule(3,9,0)
+si2_14micro = panel4:getModule(4,6,0)
+
+si2_15knob = panel4:getModule(6,6,0)
+si2_15gauge = panel4:getModule(6,7,0)
+si2_15nametag = panel4:getModule(6,10,0)
+si2_15clock = panel4:getModule(6,9,0)
+si2_15micro = panel4:getModule(7,6,0)
+
+si2_16knob = panel4:getModule(9,6,0)
+si2_16gauge = panel4:getModule(9,7,0)
+si2_16nametag = panel4:getModule(9,10,0)
+si2_16clock = panel4:getModule(9,9,0)
+si2_16micro = panel4:getModule(10,6,0)
 
 
--- Default Variables, Control Names
+-- MICRO PANEL CONTROL BUTTONS
+all30 = micropanel1:getModule(1,2,0)
+all15 = micropanel1:getModule(1,1,0)
+all0 = micropanel1:getModule(1,0,0)
+
+
+
+--  NAMETAGS
 si1_1nametag:setText("si1_1")
 si1_2nametag:setText("si1_2")
 si1_3nametag:setText("si1_3")
@@ -292,6 +286,239 @@ si2_14nametag:setText("si2_14")
 si2_15nametag:setText("si2_15")
 si2_16nametag:setText("si2_16")
 
+
+
+-- TIME TO DANCE!
+
+while true do
+
+
+-- PRINTING PRODUCTIVITY COLORS TO LCD PANELS
+function getColor(productivity)
+ red = (1 - productivity)  -- Red is inversely proportional to productivity
+ green = productivity      -- Green is directly proportional to productivity
+return red, green, 0, .5         -- Full red and green, with no blue or glow
+end
+
+si1_1clock:setText(math.floor((si1_1.productivity * 100)))
+si1_1clock:setColor(getColor(si1_1.productivity))
+si1_2clock:setText(math.floor((si1_2.productivity * 100)))
+si1_2clock:setColor(getColor(si1_2.productivity))
+si1_3clock:setText(math.floor((si1_3.productivity * 100)))
+si1_3clock:setColor(getColor(si1_3.productivity))
+si1_4clock:setText(math.floor((si1_4.productivity * 100)))
+si1_4clock:setColor(getColor(si1_4.productivity))
+si1_5clock:setText(math.floor((si1_5.productivity * 100)))
+si1_5clock:setColor(getColor(si1_5.productivity))
+si1_6clock:setText(math.floor((si1_6.productivity * 100)))
+si1_6clock:setColor(getColor(si1_6.productivity))
+si1_7clock:setText(math.floor((si1_7.productivity * 100)))
+si1_7clock:setColor(getColor(si1_7.productivity))
+si1_8clock:setText(math.floor((si1_8.productivity * 100)))
+si1_8clock:setColor(getColor(si1_8.productivity))
+si1_9clock:setText(math.floor((si1_9.productivity * 100)))
+si1_9clock:setColor(getColor(si1_9.productivity))
+si1_10clock:setText(math.floor((si1_10.productivity * 100)))
+si1_10clock:setColor(getColor(si1_10.productivity))
+si1_11clock:setText(math.floor((si1_11.productivity * 100)))
+si1_11clock:setColor(getColor(si1_11.productivity))
+si1_12clock:setText(math.floor((si1_12.productivity * 100)))
+si1_12clock:setColor(getColor(si1_12.productivity))
+si1_13clock:setText(math.floor((si1_13.productivity * 100)))
+si1_13clock:setColor(getColor(si1_13.productivity))
+si1_14clock:setText(math.floor((si1_14.productivity * 100)))
+si1_14clock:setColor(getColor(si1_14.productivity))
+si1_15clock:setText(math.floor((si1_15.productivity * 100)))
+si1_15clock:setColor(getColor(si1_15.productivity))
+si1_16clock:setText(math.floor((si1_16.productivity * 100)))
+si1_16clock:setColor(getColor(si1_16.productivity))
+si2_1clock:setText(math.floor((si2_1.productivity * 100)))
+si2_1clock:setColor(getColor(si2_1.productivity))
+si2_2clock:setText(math.floor((si2_2.productivity * 100)))
+si2_2clock:setColor(getColor(si2_2.productivity))
+si2_3clock:setText(math.floor((si2_3.productivity * 100)))
+si2_3clock:setColor(getColor(si2_3.productivity))
+si2_4clock:setText(math.floor((si2_4.productivity * 100)))
+si2_4clock:setColor(getColor(si2_4.productivity))
+si2_5clock:setText(math.floor((si2_5.productivity * 100)))
+si2_5clock:setColor(getColor(si2_5.productivity))
+si2_6clock:setText(math.floor((si2_6.productivity * 100)))
+si2_6clock:setColor(getColor(si2_6.productivity))
+si2_7clock:setText(math.floor((si2_7.productivity * 100)))
+si2_7clock:setColor(getColor(si2_7.productivity))
+si2_8clock:setText(math.floor((si2_8.productivity * 100)))
+si2_8clock:setColor(getColor(si2_8.productivity))
+si2_9clock:setText(math.floor((si2_9.productivity * 100)))
+si2_9clock:setColor(getColor(si2_9.productivity))
+si2_10clock:setText(math.floor((si2_10.productivity * 100)))
+si2_10clock:setColor(getColor(si2_10.productivity))
+si2_11clock:setText(math.floor((si2_11.productivity * 100)))
+si2_11clock:setColor(getColor(si2_11.productivity))
+si2_12clock:setText(math.floor((si2_12.productivity * 100)))
+si2_12clock:setColor(getColor(si2_12.productivity))
+si2_13clock:setText(math.floor((si2_13.productivity * 100)))
+si2_13clock:setColor(getColor(si2_13.productivity))
+si2_14clock:setText(math.floor((si2_14.productivity * 100)))
+si2_14clock:setColor(getColor(si2_14.productivity))
+si2_15clock:setText(math.floor((si2_15.productivity * 100)))
+si2_15clock:setColor(getColor(si2_15.productivity))
+si2_16clock:setText(math.floor((si2_16.productivity * 100)))
+si2_16clock:setColor(getColor(si2_16.productivity))
+
+
+
+-- GAUGE LIMITS
+gaugelimit = -.25
+gaugelimit_table = {
+si1_1gauge, si1_2gauge, si1_3gauge, si1_4gauge, si1_5gauge, si1_6gauge, si1_7gauge, si1_8gauge, si1_9gauge, si1_10gauge, si1_11gauge, si1_12gauge, si1_13gauge, si1_14gauge, si1_15gauge, si1_16gauge,
+si2_1gauge, si2_2gauge, si2_3gauge, si2_4gauge, si2_5gauge, si2_6gauge, si2_7gauge, si2_8gauge, si2_9gauge, si2_10gauge, si2_11gauge, si2_12gauge, si2_13gauge, si2_14gauge, si2_15gauge, si2_16gauge
+}
+for i = 1, #gaugelimit_table do
+gaugelimit_table[i].limit = gaugelimit
+end
+
+
+
+
+
+
+-- GAUGE READOUT
+si1_1gauge.percent = si1_1.productivity
+si1_2gauge.percent = si1_2.productivity
+si1_3gauge.percent = si1_3.productivity
+si1_4gauge.percent = si1_4.productivity
+si1_5gauge.percent = si1_5.productivity
+si1_6gauge.percent = si1_6.productivity
+si1_7gauge.percent = si1_7.productivity
+si1_8gauge.percent = si1_8.productivity
+si1_9gauge.percent = si1_9.productivity
+si1_10gauge.percent = si1_10.productivity
+si1_11gauge.percent = si1_11.productivity
+si1_12gauge.percent = si1_12.productivity
+si1_13gauge.percent = si1_13.productivity
+si1_14gauge.percent = si1_14.productivity
+si1_15gauge.percent = si1_15.productivity
+si1_16gauge.percent = si1_16.productivity
+
+si2_1gauge.percent = si2_1.productivity
+si2_2gauge.percent = si2_2.productivity
+si2_3gauge.percent = si2_3.productivity
+si2_4gauge.percent = si2_4.productivity
+si2_5gauge.percent = si2_5.productivity
+si2_6gauge.percent = si2_6.productivity
+si2_7gauge.percent = si2_7.productivity
+si2_8gauge.percent = si2_8.productivity
+si2_9gauge.percent = si2_9.productivity
+si2_10gauge.percent = si2_10.productivity
+si2_11gauge.percent = si2_11.productivity
+si2_12gauge.percent = si2_12.productivity
+si2_13gauge.percent = si2_13.productivity
+si2_14gauge.percent = si2_14.productivity
+si2_15gauge.percent = si2_15.productivity
+si2_16gauge.percent = si2_16.productivity   
+
+
+
+
+
+-- KNOB LIMIT 1-30
+    knobs = {
+        si1_1knob,   si1_2knob,   si1_3knob,   si1_4knob,   si1_5knob,   si1_6knob,   si1_7knob,   si1_8knob,   si1_9knob,   si1_10knob,   si1_11knob,   si1_12knob,   si1_13knob,   si1_14knob,   si1_15knob,   si1_16knob,  
+        si2_1knob,   si2_2knob,   si2_3knob,   si2_4knob,   si2_5knob,   si2_6knob,   si2_7knob,   si2_8knob,   si2_9knob,   si2_10knob,   si2_11knob,   si2_12knob,   si2_13knob,   si2_14knob,   si2_15knob,   si2_16knob
+    }
+    
+    for i = 1,   #knobs do
+        knobs[i].min = 1
+        knobs[i].max = 30
+    end
+
+
+-- LCD KNOB MIRRORING
+si1_1micro:setText(si1_1knob.value)
+si1_2micro:setText(si1_2knob.value)
+si1_3micro:setText(si1_3knob.value)
+si1_4micro:setText(si1_4knob.value)
+si1_5micro:setText(si1_5knob.value)
+si1_6micro:setText(si1_6knob.value)
+si1_7micro:setText(si1_7knob.value)
+si1_8micro:setText(si1_8knob.value)
+si1_9micro:setText(si1_9knob.value)
+si1_10micro:setText(si1_10knob.value)
+si1_11micro:setText(si1_11knob.value)
+si1_12micro:setText(si1_12knob.value)
+si1_13micro:setText(si1_13knob.value)
+si1_14micro:setText(si1_14knob.value)
+si1_15micro:setText(si1_15knob.value)
+si1_16micro:setText(si1_16knob.value)
+
+si2_1micro:setText(si2_1knob.value)
+si2_2micro:setText(si2_2knob.value)
+si2_3micro:setText(si2_3knob.value)
+si2_4micro:setText(si2_4knob.value)
+si2_5micro:setText(si2_5knob.value)
+si2_6micro:setText(si2_6knob.value)
+si2_7micro:setText(si2_7knob.value)
+si2_8micro:setText(si2_8knob.value)
+si2_9micro:setText(si2_9knob.value)
+si2_10micro:setText(si2_10knob.value)
+si2_11micro:setText(si2_11knob.value)
+si2_12micro:setText(si2_12knob.value)
+si2_13micro:setText(si2_13knob.value)
+si2_14micro:setText(si2_14knob.value)
+si2_15micro:setText(si2_15knob.value)
+si2_16micro:setText(si2_16knob.value)
+-- KNOB TO SMELTER POTENTIAL
+si1_1:setPotential(((si1_1knob.value/100)*3.33333))
+si1_2:setPotential(((si1_2knob.value/100)*3.33333))
+si1_3:setPotential(((si1_3knob.value/100)*3.33333))
+si1_4:setPotential(((si1_4knob.value/100)*3.33333))
+si1_5:setPotential(((si1_5knob.value/100)*3.33333))
+si1_6:setPotential(((si1_6knob.value/100)*3.33333))
+si1_7:setPotential(((si1_7knob.value/100)*3.33333))
+si1_8:setPotential(((si1_8knob.value/100)*3.33333))
+si1_9:setPotential(((si1_9knob.value/100)*3.33333))
+si1_10:setPotential(((si1_10knob.value/100)*3.33333))
+si1_11:setPotential(((si1_11knob.value/100)*3.33333))
+si1_12:setPotential(((si1_12knob.value/100)*3.33333))
+si1_13:setPotential(((si1_13knob.value/100)*3.33333))
+si1_14:setPotential(((si1_14knob.value/100)*3.33333))
+si1_15:setPotential(((si1_15knob.value/100)*3.33333))
+si1_16:setPotential(((si1_16knob.value/100)*3.33333))
+
+si2_1:setPotential(((si2_1knob.value/100)*3.33333))
+si2_2:setPotential(((si2_2knob.value/100)*3.33333))
+si2_3:setPotential(((si2_3knob.value/100)*3.33333))
+si2_4:setPotential(((si2_4knob.value/100)*3.33333))
+si2_5:setPotential(((si2_5knob.value/100)*3.33333))
+si2_6:setPotential(((si2_6knob.value/100)*3.33333))
+si2_7:setPotential(((si2_7knob.value/100)*3.33333))
+si2_8:setPotential(((si2_8knob.value/100)*3.33333))
+si2_9:setPotential(((si2_9knob.value/100)*3.33333))
+si2_10:setPotential(((si2_10knob.value/100)*3.33333))
+si2_11:setPotential(((si2_11knob.value/100)*3.33333))
+si2_12:setPotential(((si2_12knob.value/100)*3.33333))
+si2_13:setPotential(((si2_13knob.value/100)*3.33333))
+si2_14:setPotential(((si2_14knob.value/100)*3.33333))
+si2_15:setPotential(((si2_15knob.value/100)*3.33333))
+si2_16:setPotential(((si2_16knob.value/100)*3.33333))
+
+
+
+
+
+
+
+
+
+end
+
+
+-- DEBUGGING
+-- print(si1_2.potential)
+-- si1_1:setPotential(((si1_1knob.value/100)*3.33333))
+-- computer.textNotification(si1_16.Potential)
+-- computer.textNotification(si1_16.Potential)
+-- si1_1micro:setText(si1_1knob.value)
 
 
 
