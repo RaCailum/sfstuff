@@ -1,5 +1,5 @@
 -- CONTROL PANELS
-panelmicro1 = component.proxy("870683C1443028EB4CA774834EF2C05D")
+panelmicro1 = component.proxy("2ED482AB43475B22B330388EC00A7E1B")
 panel1 = component.proxy("2ED482AB43475B22B330388EC00A7E1B")
 panel2 = component.proxy("B12C0BC949471FE48DEB1AA596ADD9CE")
 panel3 = component.proxy("84364CD846354ED3D416E6ADD4535457")
@@ -239,9 +239,9 @@ si2_16micro = panel4:getModule(10,6,0)
 
 
 -- MICRO PANEL CONTROL BUTTONS
-all30 = micropanel1:getModule(1,2,0)
-all15 = micropanel1:getModule(1,1,0)
-all0 = micropanel1:getModule(1,0,0)
+all30 = panelmicro1:getModule(0,2,0)
+all15 = panelmicro1:getModule(0,1,0)
+all0 = panelmicro1:getModule(0,0,0)
 
 
 
