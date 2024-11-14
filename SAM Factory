@@ -1,12 +1,8 @@
 -- CONTROL PANELS
-panelmicro1 = component.proxy("2ED482AB43475B22B330388EC00A7E1B")
 panel1 = component.proxy("2ED482AB43475B22B330388EC00A7E1B")
 panel2 = component.proxy("B12C0BC949471FE48DEB1AA596ADD9CE")
 panel3 = component.proxy("84364CD846354ED3D416E6ADD4535457")
 panel4 = component.proxy("81702C594F27314005794A829E6D27F6")
-
--- MICRO PANEL CONTROLS 
-
 
 -- IRON SMELTERS
 si1_1 = component.proxy("9A45FF494C1F055C17B2558BB31B5034")
@@ -237,12 +233,15 @@ si2_16nametag = panel4:getModule(9,10,0)
 si2_16clock = panel4:getModule(9,9,0)
 si2_16micro = panel4:getModule(10,6,0)
 
+siOutputScreen = panel1:getModule(0,0,1)
 
--- MICRO PANEL CONTROL BUTTONS
-all30 = panelmicro1:getModule(0,2,0)
-all15 = panelmicro1:getModule(0,1,0)
-all0 = panelmicro1:getModule(0,0,0)
+button30 = panel1:getModule(4,0,1)
+button15 = panel1:getModule(5,0,1)
+button0 = panel1:getModule(6,0,1)
 
+button30:setColor(0,1,0,.5)
+button15:setColor(1,1,0,.5)
+button0:setColor(1,0,0,.5)
 
 
 --  NAMETAGS
@@ -295,8 +294,8 @@ while true do
 
 -- PRINTING PRODUCTIVITY COLORS TO LCD PANELS
 function getColor(productivity)
- red = (1 - productivity)  -- Red is inversely proportional to productivity
- green = productivity      -- Green is directly proportional to productivity
+red = (1 - productivity)  -- Red is inversely proportional to productivity
+green = productivity      -- Green is directly proportional to productivity
 return red, green, 0, .5         -- Full red and green, with no blue or glow
 end
 
@@ -379,9 +378,6 @@ end
 
 
 
-
-
-
 -- GAUGE READOUT
 si1_1gauge.percent = si1_1.productivity
 si1_2gauge.percent = si1_2.productivity
@@ -422,15 +418,15 @@ si2_16gauge.percent = si2_16.productivity
 
 
 -- KNOB LIMIT 1-30
-    knobs = {
-        si1_1knob,   si1_2knob,   si1_3knob,   si1_4knob,   si1_5knob,   si1_6knob,   si1_7knob,   si1_8knob,   si1_9knob,   si1_10knob,   si1_11knob,   si1_12knob,   si1_13knob,   si1_14knob,   si1_15knob,   si1_16knob,  
-        si2_1knob,   si2_2knob,   si2_3knob,   si2_4knob,   si2_5knob,   si2_6knob,   si2_7knob,   si2_8knob,   si2_9knob,   si2_10knob,   si2_11knob,   si2_12knob,   si2_13knob,   si2_14knob,   si2_15knob,   si2_16knob
-    }
-    
-    for i = 1,   #knobs do
-        knobs[i].min = 1
-        knobs[i].max = 30
-    end
+knobs = {
+    si1_1knob,   si1_2knob,   si1_3knob,   si1_4knob,   si1_5knob,   si1_6knob,   si1_7knob,   si1_8knob,   si1_9knob,   si1_10knob,   si1_11knob,   si1_12knob,   si1_13knob,   si1_14knob,   si1_15knob,   si1_16knob,  
+    si2_1knob,   si2_2knob,   si2_3knob,   si2_4knob,   si2_5knob,   si2_6knob,   si2_7knob,   si2_8knob,   si2_9knob,   si2_10knob,   si2_11knob,   si2_12knob,   si2_13knob,   si2_14knob,   si2_15knob,   si2_16knob
+}
+
+for i = 1,   #knobs do
+    knobs[i].min = 1
+    knobs[i].max = 30
+end
 
 
 -- LCD KNOB MIRRORING
@@ -467,6 +463,7 @@ si2_13micro:setText(si2_13knob.value)
 si2_14micro:setText(si2_14knob.value)
 si2_15micro:setText(si2_15knob.value)
 si2_16micro:setText(si2_16knob.value)
+
 -- KNOB TO SMELTER POTENTIAL
 si1_1:setPotential(((si1_1knob.value/100)*3.33333))
 si1_2:setPotential(((si1_2knob.value/100)*3.33333))
@@ -503,6 +500,40 @@ si2_15:setPotential(((si2_15knob.value/100)*3.33333))
 si2_16:setPotential(((si2_16knob.value/100)*3.33333))
 
 
+-- IRON INGOTS / MIN FOR SIGN
+IronIngotPerMin = 0  -- Initialize the variable to 0
+
+-- List of all knob variables
+knobs = {
+    si1_1knob, si1_2knob, si1_3knob, si1_4knob, si1_5knob, si1_6knob, si1_7knob, si1_8knob, si1_9knob, si1_10knob, si1_11knob, si1_12knob, si1_13knob, si1_14knob, si1_15knob, si1_16knob,
+    si2_1knob, si2_2knob, si2_3knob, si2_4knob, si2_5knob, si2_6knob, si2_7knob, si2_8knob, si2_9knob, si2_10knob, si2_11knob, si2_12knob, si2_13knob, si2_14knob, si2_15knob, si2_16knob
+}
+
+-- Iterate through each knob and add its value to IronIngotPerMin
+for i = 1, #knobs do
+    IronIngotPerMin = IronIngotPerMin + knobs[i].value
+end
+
+-- Now, IronIngotPerMin will hold the sum of all the knob values
+-- ic Display Total Screen
+    siOutputScreen.size = 50
+
+    siOutputScreen.text = "Iron Ingots \n" .. IronIngotPerMin .. "/ min"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -511,6 +542,13 @@ si2_16:setPotential(((si2_16knob.value/100)*3.33333))
 
 
 end
+
+
+
+
+
+
+
 
 
 -- DEBUGGING
