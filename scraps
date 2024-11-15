@@ -1,3 +1,10 @@
+ -- PRINTING PRODUCTIVITY COLORS TO LCD PANELS
+    function getColor(productivity)
+        red = (1 - productivity) -- Red is inversely proportional to productivity
+        green = productivity -- Green is directly proportional to productivity
+        return red, green, 0, .5 -- Full red and green, with no blue or glow
+    end
+
     si1_1clock:setText(math.floor((si1_1.productivity * 100)))
     si1_1clock:setColor(getColor(si1_1.productivity))
     si1_2clock:setText(math.floor((si1_2.productivity * 100)))
