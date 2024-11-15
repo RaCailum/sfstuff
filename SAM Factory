@@ -4,6 +4,7 @@ panel2 = component.proxy("B12C0BC949471FE48DEB1AA596ADD9CE")
 panel3 = component.proxy("84364CD846354ED3D416E6ADD4535457")
 panel4 = component.proxy("81702C594F27314005794A829E6D27F6")
 panelmicro1 = component.proxy("D7688D8F433FF3F44A52398B8090E295")
+panelsi_output = component.proxy("4073C1F347EB08FE699A1AB5E4C2B4FD")
 
 -- IRON SMELTERS
 si1_1 = component.proxy("9A45FF494C1F055C17B2558BB31B5034")
@@ -38,6 +39,26 @@ si2_13 = component.proxy("7E3F2E6B440E337F1D149798B477C43C")
 si2_14 = component.proxy("3F2ACCBA4D45071ADF0CB498F7278910")
 si2_15 = component.proxy("9F34E18C475653365A49079B9542A042")
 si2_16 = component.proxy("24591321487C75BD5D8AAB90C2EFAAFA")
+
+-- Reanimated SAM Constructors
+
+resam1 = component.proxy("0A2DABB84EFFCD87A3F3B59B4B322551")
+resam2 = component.proxy("38568F92413EB2681C46099EE966ED28")
+resam3 = component.proxy("1D705E2F47400E0E4CC17F901724DC5E")
+resam4 = component.proxy("0D6541D246CDD24E62D339A5C7538909")
+resam5 = component.proxy("1075662949D71BFF325DF6B80DA7FA45")
+resam6 = component.proxy("AA955FAE43A3F9B91C333FBE093CF1EA")
+resam7 = component.proxy("E42F5AAA4A574791C6E5DF9D750AB566")
+resam8 = component.proxy("2341B43F4C8D894E43755F9F1F65BB3A")
+resam9 = component.proxy("65E75C8442E1CB813F270F9257DE72EA")
+resam10 = component.proxy("8AD4EA3F45C229D0D52C579DA1525026")
+
+
+resamoutputcounter = component.proxy("45DEFEE146CAFEF6343FB2A3B3853763")
+
+
+
+
 
 -- CONTROL PANEL BUTTONS
 si1_1knob = panel1:getModule(0, 0, 0)
@@ -232,11 +253,27 @@ si2_16nametag = panel4:getModule(9, 10, 0)
 si2_16clock = panel4:getModule(9, 9, 0)
 si2_16micro = panel4:getModule(10, 6, 0)
 
-siOutputScreen = panel1:getModule(0, 0, 1)
+siOutputScreen = panelsi_output:getModule(0, 0, 0)
 
 button30 = panelmicro1:getModule(0, 0, 0)
 button15 = panelmicro1:getModule(1, 0, 0)
 button0 = panelmicro1:getModule(2, 0, 0)
+
+-- Re:SAM Panel
+
+resameff1 = panel1:getModule(0, 0, 1)
+resameff2 = panel1:getModule(2, 0, 1)
+resameff3 = panel1:getModule(4, 0, 1)
+resameff4 = panel1:getModule(0, 2, 1)
+resameff5 = panel1:getModule(2, 2, 1)
+resameff6 = panel1:getModule(4, 2, 1)
+resameff7 = panel1:getModule(0, 4, 1)
+resameff8 = panel1:getModule(2, 4, 1)
+resameff9 = panel1:getModule(4, 4, 1)
+resameff10 = panel1:getModule(0, 6, 0)
+resameffscreen = panel1:getModule(2, 6, 0)
+
+
 
 button30:setColor(0, 1, 0, .5)
 button15:setColor(1, 1, 0, .5)
@@ -700,7 +737,7 @@ while true do
     -- ic Display Total Screen
     siOutputScreen.size = 60
 
-    siOutputScreen.text = "Iron Ingots \n" .. IronIngotPerMin .. "/ min"
+    siOutputScreen.text = "Iron Ingots \n" .. IronIngotPerMin .. " / min"
 end
 
 -- DEBUGGING
