@@ -53,7 +53,6 @@ resam8 = component.proxy("2341B43F4C8D894E43755F9F1F65BB3A")
 resam9 = component.proxy("65E75C8442E1CB813F270F9257DE72EA")
 resam10 = component.proxy("8AD4EA3F45C229D0D52C579DA1525026")
 
-
 resamoutputcounter = component.proxy("45DEFEE146CAFEF6343FB2A3B3853763")
 
 
@@ -270,8 +269,8 @@ resameff6 = panel1:getModule(4, 2, 1)
 resameff7 = panel1:getModule(0, 4, 1)
 resameff8 = panel1:getModule(2, 4, 1)
 resameff9 = panel1:getModule(4, 4, 1)
-resameff10 = panel1:getModule(0, 6, 0)
-resameffscreen = panel1:getModule(2, 6, 0)
+resameff10 = panel1:getModule(0, 6, 1)
+resameffscreen = panel1:getModule(2, 6, 1)
 
 
 
@@ -738,6 +737,34 @@ while true do
     siOutputScreen.size = 60
 
     siOutputScreen.text = "Iron Ingots \n" .. IronIngotPerMin .. " / min"
+    
+    
+    
+    
+    
+    
+    
+    -- Re:SAM Eff Displays
+resameff1:setText(math.floor((resam1.productivity * 100)) .. "%")
+resameff2:setText(math.floor((resam2.productivity * 100)) .. "%")
+resameff3:setText(math.floor((resam3.productivity * 100)) .. "%")
+resameff4:setText(math.floor((resam4.productivity * 100)) .. "%")
+resameff5:setText(math.floor((resam5.productivity * 100)) .. "%")
+resameff6:setText(math.floor((resam6.productivity * 100)) .. "%")
+resameff7:setText(math.floor((resam7.productivity * 100)) .. "%")
+resameff8:setText(math.floor((resam8.productivity * 100)) .. "%")
+resameff9:setText(math.floor((resam9.productivity * 100)) .. "%")
+resameff10:setText(math.floor((resam10.productivity * 100)) .. "%")
+    
+    --print(resameff6.text)
+    
+    
+
+    
+    
+    
+    
+    
 end
 
 -- DEBUGGING
@@ -752,6 +779,7 @@ end
 
 -- Constructor Clock
 -- si1_1:setPotential(OC/100)
+-- print(resam7.potential)
 
 -- OC Knob
 -- potent.min = 1
