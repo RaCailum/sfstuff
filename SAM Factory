@@ -3,6 +3,7 @@ panel1 = component.proxy("2ED482AB43475B22B330388EC00A7E1B")
 panel2 = component.proxy("B12C0BC949471FE48DEB1AA596ADD9CE")
 panel3 = component.proxy("84364CD846354ED3D416E6ADD4535457")
 panel4 = component.proxy("81702C594F27314005794A829E6D27F6")
+panelmicro1 = component.proxy("D7688D8F433FF3F44A52398B8090E295")
 
 -- IRON SMELTERS
 si1_1 = component.proxy("9A45FF494C1F055C17B2558BB31B5034")
@@ -233,9 +234,9 @@ si2_16micro = panel4:getModule(10, 6, 0)
 
 siOutputScreen = panel1:getModule(0, 0, 1)
 
-button30 = panel1:getModule(4, 0, 1)
-button15 = panel1:getModule(5, 0, 1)
-button0 = panel1:getModule(6, 0, 1)
+button30 = panelmicro1:getModule(0, 0, 0)
+button15 = panelmicro1:getModule(1, 0, 0)
+button0 = panelmicro1:getModule(2, 0, 0)
 
 button30:setColor(0, 1, 0, .5)
 button15:setColor(1, 1, 0, .5)
@@ -284,114 +285,113 @@ si2_16nametag:setText("si2_16")
 
 -- TIME TO DANCE!
 
--- 30/15/0 MASTER BUTTONS
-    event.listen(button30, button15, button0)
+event.listen(button30, button15, button0)
 
-    while true do
-        e, s = event.pull(1)
-        
-        if s == button30 then
-            -- Set all knobs to 30
-    si1_1knob.value = 30
-            si1_2knob.value = 30
-            si1_3knob.value = 30
-            si1_4knob.value = 30
-            si1_5knob.value = 30
-            si1_6knob.value = 30
-            si1_7knob.value = 30
-            si1_8knob.value = 30
-            si1_9knob.value = 30
-            si1_10knob.value = 30
-            si1_11knob.value = 30
-            si1_12knob.value = 30
-            si1_13knob.value = 30
-            si1_14knob.value = 30
-            si1_15knob.value = 30
-            si1_16knob.value = 30
-            si2_1knob.value = 30
-            si2_2knob.value = 30
-            si2_3knob.value = 30
-            si2_4knob.value = 30
-            si2_5knob.value = 30
-            si2_6knob.value = 30
-            si2_7knob.value = 30
-            si2_8knob.value = 30
-            si2_9knob.value = 30
-            si2_10knob.value = 30
-            si2_11knob.value = 30
-            si2_12knob.value = 30
-            si2_13knob.value = 30
-            si2_14knob.value = 30
-            si2_15knob.value = 30
-            si2_16knob.value = 30
-        elseif s == button15 then
-            -- Set all knobs to 15
-            si1_1knob.value = 15
-            si1_2knob.value = 15
-            si1_3knob.value = 15
-            si1_4knob.value = 15
-            si1_5knob.value = 15
-            si1_6knob.value = 15
-            si1_7knob.value = 15
-            si1_8knob.value = 15
-            si1_9knob.value = 15
-            si1_10knob.value = 15
-            si1_11knob.value = 15
-            si1_12knob.value = 15
-            si1_13knob.value = 15
-            si1_14knob.value = 15
-            si1_15knob.value = 15
-            si1_16knob.value = 15
-            si2_1knob.value = 15
-            si2_2knob.value = 15
-            si2_3knob.value = 15
-            si2_4knob.value = 15
-            si2_5knob.value = 15
-            si2_6knob.value = 15
-            si2_7knob.value = 15
-            si2_8knob.value = 15
-            si2_9knob.value = 15
-            si2_10knob.value = 15
-            si2_11knob.value = 15
-            si2_12knob.value = 15
-            si2_13knob.value = 15
-            si2_14knob.value = 15
-            si2_15knob.value = 15
-            si2_16knob.value = 15
-        elseif s == button0 then
-            -- Set all knobs to 0
-            si1_1knob.value = 0
-            si1_2knob.value = 0
-            si1_3knob.value = 0
-            si1_4knob.value = 0
-            si1_5knob.value = 0
-            si1_6knob.value = 0
-            si1_7knob.value = 0
-            si1_8knob.value = 0
-            si1_9knob.value = 0
-            si1_10knob.value = 0
-            si1_11knob.value = 0
-            si1_12knob.value = 0
-            si1_13knob.value = 0
-            si1_14knob.value = 0
-            si1_15knob.value = 0
-            si1_16knob.value = 0
-            si2_1knob.value = 0
-            si2_2knob.value = 0
-            si2_3knob.value = 0
-            si2_4knob.value = 0
-            si2_5knob.value = 0
-            si2_6knob.value = 0
-            si2_7knob.value = 0
-            si2_8knob.value = 0
-            si2_9knob.value = 0
-            si2_10knob.value = 0
-            si2_11knob.value = 0
-            si2_12knob.value = 0
-            si2_13knob.value = 0
-            si2_14knob.value = 0
-            si2_15knob.value = 0
-            si2_16knob.value = 0
+while true do
+    e, s = event.pull(1)
+    
+    if s == button30 then
+        -- Set all knobs to 30
+ si1_1knob.value = 30
+        si1_2knob.value = 30
+        si1_3knob.value = 30
+        si1_4knob.value = 30
+        si1_5knob.value = 30
+        si1_6knob.value = 30
+        si1_7knob.value = 30
+        si1_8knob.value = 30
+        si1_9knob.value = 30
+        si1_10knob.value = 30
+        si1_11knob.value = 30
+        si1_12knob.value = 30
+        si1_13knob.value = 30
+        si1_14knob.value = 30
+        si1_15knob.value = 30
+        si1_16knob.value = 30
+        si2_1knob.value = 30
+        si2_2knob.value = 30
+        si2_3knob.value = 30
+        si2_4knob.value = 30
+        si2_5knob.value = 30
+        si2_6knob.value = 30
+        si2_7knob.value = 30
+        si2_8knob.value = 30
+        si2_9knob.value = 30
+        si2_10knob.value = 30
+        si2_11knob.value = 30
+        si2_12knob.value = 30
+        si2_13knob.value = 30
+        si2_14knob.value = 30
+        si2_15knob.value = 30
+        si2_16knob.value = 30
+    elseif s == button15 then
+        -- Set all knobs to 15
+        si1_1knob.value = 15
+        si1_2knob.value = 15
+        si1_3knob.value = 15
+        si1_4knob.value = 15
+        si1_5knob.value = 15
+        si1_6knob.value = 15
+        si1_7knob.value = 15
+        si1_8knob.value = 15
+        si1_9knob.value = 15
+        si1_10knob.value = 15
+        si1_11knob.value = 15
+        si1_12knob.value = 15
+        si1_13knob.value = 15
+        si1_14knob.value = 15
+        si1_15knob.value = 15
+        si1_16knob.value = 15
+        si2_1knob.value = 15
+        si2_2knob.value = 15
+        si2_3knob.value = 15
+        si2_4knob.value = 15
+        si2_5knob.value = 15
+        si2_6knob.value = 15
+        si2_7knob.value = 15
+        si2_8knob.value = 15
+        si2_9knob.value = 15
+        si2_10knob.value = 15
+        si2_11knob.value = 15
+        si2_12knob.value = 15
+        si2_13knob.value = 15
+        si2_14knob.value = 15
+        si2_15knob.value = 15
+        si2_16knob.value = 15
+    elseif s == button0 then
+        -- Set all knobs to 0
+        si1_1knob.value = 0
+        si1_2knob.value = 0
+        si1_3knob.value = 0
+        si1_4knob.value = 0
+        si1_5knob.value = 0
+        si1_6knob.value = 0
+        si1_7knob.value = 0
+        si1_8knob.value = 0
+        si1_9knob.value = 0
+        si1_10knob.value = 0
+        si1_11knob.value = 0
+        si1_12knob.value = 0
+        si1_13knob.value = 0
+        si1_14knob.value = 0
+        si1_15knob.value = 0
+        si1_16knob.value = 0
+        si2_1knob.value = 0
+        si2_2knob.value = 0
+        si2_3knob.value = 0
+        si2_4knob.value = 0
+        si2_5knob.value = 0
+        si2_6knob.value = 0
+        si2_7knob.value = 0
+        si2_8knob.value = 0
+        si2_9knob.value = 0
+        si2_10knob.value = 0
+        si2_11knob.value = 0
+        si2_12knob.value = 0
+        si2_13knob.value = 0
+        si2_14knob.value = 0
+        si2_15knob.value = 0
+        si2_16knob.value = 0
         end
 
 
