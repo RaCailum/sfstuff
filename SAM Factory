@@ -431,7 +431,7 @@ while true do
         end
 
 
-    -- PRINTING PRODUCTIVITY COLORS TO LCD PANELS
+    -- PRINTING SMELTER PRODUCTIVITY COLORS TO LCD PANELS
     function getColor(productivity)
         red = (1 - productivity) -- Red is inversely proportional to productivity
         green = productivity -- Green is directly proportional to productivity
@@ -502,6 +502,7 @@ while true do
     si2_15clock:setColor(getColor(si2_15.productivity))
     si2_16clock:setText(math.floor((si2_16.productivity * 100)))
     si2_16clock:setColor(getColor(si2_16.productivity))
+    
 
     -- GAUGE LIMITS
     gaugelimit = -.25
@@ -744,49 +745,38 @@ while true do
     
     
     
-    -- Re:SAM Eff Displays
-resameff1:setText(math.floor((resam1.productivity * 100)) .. "%")
-resameff2:setText(math.floor((resam2.productivity * 100)) .. "%")
-resameff3:setText(math.floor((resam3.productivity * 100)) .. "%")
-resameff4:setText(math.floor((resam4.productivity * 100)) .. "%")
-resameff5:setText(math.floor((resam5.productivity * 100)) .. "%")
-resameff6:setText(math.floor((resam6.productivity * 100)) .. "%")
-resameff7:setText(math.floor((resam7.productivity * 100)) .. "%")
-resameff8:setText(math.floor((resam8.productivity * 100)) .. "%")
-resameff9:setText(math.floor((resam9.productivity * 100)) .. "%")
-resameff10:setText(math.floor((resam10.productivity * 100)) .. "%")
+    -- Re:SAM EFF DISPLAYS
+	resameff1:setText(math.floor((resam1.productivity * 100)) .. "%")
+	resameff2:setText(math.floor((resam2.productivity * 100)) .. "%")
+	resameff3:setText(math.floor((resam3.productivity * 100)) .. "%")
+	resameff4:setText(math.floor((resam4.productivity * 100)) .. "%")
+	resameff5:setText(math.floor((resam5.productivity * 100)) .. "%")
+	resameff6:setText(math.floor((resam6.productivity * 100)) .. "%")
+	resameff7:setText(math.floor((resam7.productivity * 100)) .. "%")
+	resameff8:setText(math.floor((resam8.productivity * 100)) .. "%")
+	resameff9:setText(math.floor((resam9.productivity * 100)) .. "%")
+	resameff10:setText(math.floor((resam10.productivity * 100)) .. "%")
    
-   
-   
-   
-	-- Re:SAM Eff Display Colors
+	-- PRINTING RE:SAM PRODUCTIVITY COLORS TO LCD PANELS
+	resameff1:setColor(getColor(resam1.productivity))
+	resameff2:setColor(getColor(resam2.productivity))
+	resameff3:setColor(getColor(resam3.productivity))
+	resameff4:setColor(getColor(resam4.productivity))
+	resameff5:setColor(getColor(resam5.productivity))
+	resameff6:setColor(getColor(resam6.productivity))
+	resameff7:setColor(getColor(resam7.productivity))
+	resameff8:setColor(getColor(resam8.productivity))
+	resameff9:setColor(getColor(resam9.productivity))
+	resameff10:setColor(getColor(resam10.productivity))  
+	
+	
+	
 	
 	function getColor(productivity)
         red = (1 - productivity) -- Red is inversely proportional to productivity
         green = productivity -- Green is directly proportional to productivity
         return red, green, 0, .5 -- Full red and green, with no blue or glow
     end
-
-    si1_1clock:setText(math.floor((si1_1.productivity * 100)))
-    si1_1clock:setColor(getColor(si1_1.productivity))
-    si1_2clock:setText(math.floor((si1_2.productivity * 100)))
-    si1_2clock:setColor(getColor(si1_2.productivity))
-    si1_3clock:setText(math.floor((si1_3.productivity * 100)))
-    si1_3clock:setColor(getColor(si1_3.productivity))
-    si1_4clock:setText(math.floor((si1_4.productivity * 100)))
-    si1_4clock:setColor(getColor(si1_4.productivity))
-    si1_5clock:setText(math.floor((si1_5.productivity * 100)))
-    si1_5clock:setColor(getColor(si1_5.productivity))
-    si1_6clock:setText(math.floor((si1_6.productivity * 100)))
-    si1_6clock:setColor(getColor(si1_6.productivity))
-    si1_7clock:setText(math.floor((si1_7.productivity * 100)))
-    si1_7clock:setColor(getColor(si1_7.productivity))
-    si1_8clock:setText(math.floor((si1_8.productivity * 100)))
-    si1_8clock:setColor(getColor(si1_8.productivity))
-    si1_9clock:setText(math.floor((si1_9.productivity * 100)))
-    si1_9clock:setColor(getColor(si1_9.productivity))
-    si1_10clock:setText(math.floor((si1_10.productivity * 100)))
-    si1_10clock:setColor(getColor(si1_10.productivity))
    
    
    
