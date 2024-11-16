@@ -743,7 +743,7 @@ while true do
     
     
     
-    
+    -- RE:SAM STUFF
     
     -- Re:SAM EFF DISPLAYS
 	resameff1:setText(math.floor((resam1.productivity * 100)) .. "%")
@@ -769,7 +769,8 @@ while true do
 	resameff9:setColor(getColor(resam9.productivity))
 	resameff10:setColor(getColor(resam10.productivity))  
 	
-	
+	-- OUTPUT CHECKER
+	resamoutputcounter:text(math.floor(resamoutputcounter:injectedinput()))
 	
 	
 	function getColor(productivity)
