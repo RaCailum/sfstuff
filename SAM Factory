@@ -6,6 +6,13 @@ panel4 = component.proxy("81702C594F27314005794A829E6D27F6")
 panelmicro1 = component.proxy("D7688D8F433FF3F44A52398B8090E295")
 panelsi_output = component.proxy("4073C1F347EB08FE699A1AB5E4C2B4FD")
 
+-- Screens & GPU
+gpu = computer.getPCIDevices(classes.GPU_T1_C)[1]
+screen = component.proxy("0C8857854AB4D828E53E1386E7E84824")
+gpu:bindScreen(screen)
+gpu:setSize(60,15)
+
+
 -- IRON SMELTERS
 si1_1 = component.proxy("9A45FF494C1F055C17B2558BB31B5034")
 si1_2 = component.proxy("F7B3D48A4917C5BE144C8AA4B62C2CB1")
@@ -53,7 +60,7 @@ resam8 = component.proxy("2341B43F4C8D894E43755F9F1F65BB3A")
 resam9 = component.proxy("65E75C8442E1CB813F270F9257DE72EA")
 resam10 = component.proxy("8AD4EA3F45C229D0D52C579DA1525026")
 
-resamoutputcounter = component.proxy("45DEFEE146CAFEF6343FB2A3B3853763")
+resamoutputcounter = component.proxy("FD411BED4F2FFC4D13DE89962AB53210")
 
 
 
@@ -272,8 +279,6 @@ resameff9 = panel1:getModule(4, 4, 1)
 resameff10 = panel1:getModule(0, 6, 1)
 resameffscreen = panel1:getModule(2, 6, 1)
 
-
-
 button30:setColor(0, 1, 0, .5)
 button15:setColor(1, 1, 0, .5)
 button0:setColor(1, 0, 0, .5)
@@ -328,7 +333,7 @@ while true do
     
     if s == button30 then
         -- Set all knobs to 30
- si1_1knob.value = 30
+ 		si1_1knob.value = 30
         si1_2knob.value = 30
         si1_3knob.value = 30
         si1_4knob.value = 30
@@ -429,6 +434,30 @@ while true do
         si2_15knob.value = 0
         si2_16knob.value = 0
         end
+
+
+
+--GPU TESTING
+w,h = gpu:getSize()
+gpu:setBackground(0,0,0,0)
+gpu:fill(0,0,w,h, " ")
+gpu:setText(0,0,"reSAM Efficiency:")
+gpu:setText(0,2,"reSAM 1: " .. tostring(math.floor(resam1.productivity * 100)) .. "%")
+gpu:setText(0,3,"reSAM 2: " .. tostring(math.floor(resam2.productivity * 100)) .. "%")
+gpu:setText(0,4,"reSAM 3: " .. tostring(math.floor(resam3.productivity * 100)) .. "%")
+gpu:setText(0,5,"reSAM 4: " .. tostring(math.floor(resam4.productivity * 100)) .. "%")
+gpu:setText(0,6,"reSAM 5: " .. tostring(math.floor(resam5.productivity * 100)) .. "%")
+gpu:setText(0,7,"reSAM 6: " .. tostring(math.floor(resam6.productivity * 100)) .. "%")
+gpu:setText(0,8,"reSAM 7: " .. tostring(math.floor(resam7.productivity * 100)) .. "%")
+gpu:setText(0,9,"reSAM 8: " .. tostring(math.floor(resam8.productivity * 100)) .. "%")
+gpu:setText(0,10,"reSAM 9: " .. tostring(math.floor(resam9.productivity * 100)) .. "%")
+gpu:setText(0,11,"reSAM 10: " .. tostring(math.floor(resam10.productivity * 100)) .. "%")
+gpu:setText(0,13,"Total reSAM Efficiency: " .. math.floor((tostring(resam1.productivity) + tostring(resam2.productivity) + tostring(resam3.productivity) + tostring(resam4.productivity) + tostring(resam5.productivity) + tostring(resam6.productivity) + tostring(resam7.productivity) + tostring(resam8.productivity) + tostring(resam9.productivity)  + tostring(resam10.productivity)) *100/10) .. "%")
+
+
+
+gpu:flush()
+
 
 
     -- PRINTING SMELTER PRODUCTIVITY COLORS TO LCD PANELS
@@ -736,14 +765,13 @@ while true do
 
     -- ic Display Total Screen
     siOutputScreen.size = 60
-
     siOutputScreen.text = "Iron Ingots \n" .. IronIngotPerMin .. " / min"
     
     
     
+
     
     
-    -- RE:SAM STUFF
     
     -- Re:SAM EFF DISPLAYS
 	resameff1:setText(math.floor((resam1.productivity * 100)) .. "%")
@@ -769,9 +797,10 @@ while true do
 	resameff9:setColor(getColor(resam9.productivity))
 	resameff10:setColor(getColor(resam10.productivity))  
 	
-	-- OUTPUT CHECKER
-	resamoutputcounter:text(math.floor(resamoutputcounter:injectedinput()))
+	resameffscreen.size = 60
+	resameffscreen.text = "Re:Sam \n" .. math.floor(resamoutputcounter:GetCurrentIPM()) .. " / min"
 	
+
 	
 	function getColor(productivity)
         red = (1 - productivity) -- Red is inversely proportional to productivity
@@ -786,6 +815,14 @@ while true do
     --print(resameff6.text)
     
     
+    
+    
+    
+    
+    
+    
+    
+
 
     
     
