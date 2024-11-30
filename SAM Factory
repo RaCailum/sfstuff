@@ -437,7 +437,7 @@ while true do
 
 
 
---GPU TESTING
+--GPU
 w,h = gpu:getSize()
 gpu:setBackground(0,0,0,0)
 gpu:fill(0,0,w,h, " ")
