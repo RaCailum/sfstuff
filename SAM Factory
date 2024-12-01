@@ -809,27 +809,15 @@ gpu:flush()
     end
    
    
-   
-   
+
    
     --print(resameff6.text)
     
-    
-    
-    
-    
-    
-    
-    
-    
 
-
-    
-    
-    
-    
-    
 end
+
+
+
 
 -- DEBUGGING
 -- print(si1_2.potential)
@@ -849,3 +837,4 @@ end
 -- potent.min = 1
 -- potent.max = 250
 -- potent:setColor (0,1,0,.5)
+-- TEST
