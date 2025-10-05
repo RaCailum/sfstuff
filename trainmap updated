@@ -1,0 +1,196 @@
+-- Color definitions
+colors = {
+    { 1, 0, 0, 1 }, -- red
+    { 0, 1, 0, 1 }, -- green
+    { 0, 0, 1, 1 }, -- blue
+    { 1, 1, 0, 1 }, -- yellow
+    { 1, 0, 1, 1 }, -- magenta
+    { 0, 1, 1, 1 }, -- cyan
+    { 1, 0.5, 0, 1 }, -- orange
+    { 0.5, 0, 1, 1 }, -- purple
+    { 0.5, 0.5, 0.5, 1 }, -- grey
+    { 0, 0, 0, 1 } -- black
+}
+
+-- Queue implementation
+local Queue = {
+    items = {},
+    first = 0,
+    last = -1
+}
+
+function Queue:push(item)
+    self.last = self.last + 1
+    self.items[self.last] = item
+end
+
+function Queue:pop()
+    if self.first > self.last then return nil end
+    local value = self.items[self.first]
+    self.items[self.first] = nil
+    self.first = self.first + 1
+    return value
+end
+
+-- Track management
+local tracks = {}
+local platformColors = {}
+local platformIndex = 1
+local screen, gpu, ScreenX, ScreenY
+
+-- Map boundaries
+local mapBounds = {
+    left = -323929,
+    top = -334717,
+    right = 424166,
+    bottom = 361634
+}
+
+-- Initialize GPU and screen
+function GPU()
+    screen = component.proxy(component.findComponent(classes.Screen))[1]
+    gpu = computer.getPCIDevices(classes.GPU_T2_C)[1]
+    gpu:bindScreen(screen)
+    size = gpu:getScreenSize(screen)
+    ScreenX = size.x
+    ScreenY = size.y
+    
+    if ScreenX ~= 0 then
+        local whalf = size.x / 2
+        local hhalf = size.y / 2
+        
+        -- Draw map quadrants
+        local mapQuadrants = {
+            {pos = {0, 0}, map = "Map_0-0"},
+            {pos = {whalf, 0}, map = "Map_1-0"},
+            {pos = {0, hhalf}, map = "Map_0-1"},
+            {pos = {whalf, hhalf}, map = "Map_1-1"}
+        }
+        
+        for _, quad in ipairs(mapQuadrants) do
+            gpu:drawBox({
+                position = quad.pos,
+                size = {whalf, hhalf},
+                rotation = 0,
+                color = {1, 1, 1, 1},
+                image = "engine:/Game/FactoryGame/Interface/UI/Assets/MapTest/SlicedMap/" .. quad.map .. "." .. quad.map,
+                imageSize = {100, 100},
+                hasCenteredOrigin = false,
+                verticalTiling = false,
+                horizontalTiling = false,
+                isBorder = false,
+                margin = {0, 0, 0, 0},
+                isRounded = false,
+                radii = {0, 0, 0, 0},
+                hasOutline = false,
+                outlineThickness = false,
+                outlineColor = {1, 1, 1, 1}
+            })
+        end
+    end
+end
+
+-- Coordinate conversion
+local function actorToScreen(x, y)
+    local rangeX = mapBounds.right - mapBounds.left
+    local rangeY = mapBounds.bottom - mapBounds.top
+    x = x - mapBounds.left
+    y = y - mapBounds.top
+    
+    if rangeY > rangeX then
+        x = x + (rangeY - rangeX) / 2
+        rangeX = rangeY
+    else
+        y = y + (rangeX - rangeY) / 2
+        rangeY = rangeX
+    end
+    
+    return math.floor(x / rangeX * (ScreenX - 5)) + 2,
+           math.floor(y / rangeY * (ScreenY + 100)) + 2
+end
+
+-- Process tracks iteratively
+local function processTrackNetwork(startTrack, platformName)
+    if not startTrack then return end
+    
+    local trackQueue = Queue
+    trackQueue:push({track = startTrack, platform = platformName})
+    
+    while true do
+        local current = trackQueue:pop()
+        if not current then break end
+        
+        local track = current.track
+        if not track or tracks[track.hash] then goto continue end
+        
+        local c0 = track:getConnection(0)
+        local c1 = track:getConnection(1)
+        if not c0 or not c1 then goto continue end
+        
+        tracks[track.hash] = {
+            loc0 = c0.connectorLocation,
+            loc1 = c1.connectorLocation,
+            masterPlatform = current.platform
+        }
+        
+        -- Queue connected tracks
+        for _, conn in pairs(c0:getConnections()) do
+            local nextTrack = conn:getTrack()
+            if nextTrack and not tracks[nextTrack.hash] then
+                trackQueue:push({track = nextTrack, platform = current.platform})
+            end
+        end
+        
+        for _, conn in pairs(c1:getConnections()) do
+            local nextTrack = conn:getTrack()
+            if nextTrack and not tracks[nextTrack.hash] then
+                trackQueue:push({track = nextTrack, platform = current.platform})
+            end
+        end
+        
+        ::continue::
+    end
+end
+
+-- Draw track function
+local function drawTrack(track)
+    if not track.x1 then
+        track.x1, track.y1 = actorToScreen(track.loc0.x, track.loc0.y)
+        track.x2, track.y2 = actorToScreen(track.loc1.x, track.loc1.y)
+    end
+    
+    local trackPoints = {{track.x1, track.y1}, {track.x2, track.y2}}
+    local color = colors[1]
+    
+    if track.masterPlatform then
+        if not platformColors[track.masterPlatform] then
+            platformColors[track.masterPlatform] = colors[platformIndex]
+            platformIndex = platformIndex % #colors + 1
+        end
+        color = platformColors[track.masterPlatform]
+    end
+    
+    gpu:drawLines(trackPoints, 10, color)
+end
+
+-- Main execution
+GPU()
+
+-- Process all platforms
+local platforms = component.proxy(component.findComponent(classes.TrainPlatform))
+for i, platform in ipairs(platforms) do
+    local trackPos = platform:getTrackPos()
+    if trackPos then
+        local stations = platform:getTrackGraph():getStations()
+        local stationName = stations and #stations > 0 and stations[1].name or "Unknown"
+        processTrackNetwork(trackPos, stationName)
+    end
+end
+
+-- Draw all tracks
+if ScreenX ~= 0 then
+    for _, track in pairs(tracks) do
+        drawTrack(track)
+    end
+    gpu:flush()
+end
