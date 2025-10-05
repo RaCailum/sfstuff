@@ -24,7 +24,7 @@ local currentPlatform = component.proxy(component.findComponent(classes.TrainPla
 trackPosArray = {}
 
 function GPU()
-    screen = component.proxy(component.findComponent(classes.Screen))[2]
+    screen = component.proxy(component.findComponent(classes.Screen))[1]
     gpu = computer.getPCIDevices(classes.GPU_T2_C)[1]
     gpu:bindScreen(screen)
     size = gpu:getScreenSize(screen)
