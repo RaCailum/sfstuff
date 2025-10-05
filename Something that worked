@@ -1,0 +1,33 @@
+local screen =
+  (component.proxy(component.findComponent(classes.Screen)[1])) or
+  (component.proxy(component.findComponent(classes.Build_Screen_C)[1])) or
+assert(screen, "No Screen component found")
+
+local gpu =
+  (computer.getPCIDevices(classes.GPU_T2_C) or {})[1] or
+  (computer.getPCIDevices(classes.Build_GPU_T2_C) or {})[1] or
+  (computer.getPCIDevices(classes.FINComputerGPUT2) or {})[1]
+assert(gpu, "No GPU PCI device found")
+
+gpu:bindScreen(screen)
+
+
+
+local gpu = gpu
+local screen = screen
+
+
+
+-- print “Hi” in white text near top-left
+gpu:drawText(
+  {x=50, y=50},           -- position in pixels
+  "Forza Was Here AAAAAAAAAAAAAAAAAAAA",             -- text
+  32,                      -- font size (try 16–48)
+  {r=1, g=1, b=1, a=1},    -- color (white)
+  true                     -- monospace (true/false)
+)
+
+
+
+
+
