@@ -1,0 +1,131 @@
+-- =====================================================
+--  Dimensional Depot Status Screen  (FN GPU_T2 confirmed)
+-- =====================================================
+
+-- === 1.  FIND AND BIND  ===
+local screen =
+  component.proxy(component.findComponent(classes.Screen)[1]) or
+  component.proxy(component.findComponent(classes.Build_Screen_C)[1])
+assert(screen, "No Screen component found")
+
+local gpu =
+  (computer.getPCIDevices(classes.GPU_T2_C) or {})[1] or
+  (computer.getPCIDevices(classes.Build_GPU_T2_C) or {})[1] or
+  (computer.getPCIDevices(classes.FINComputerGPUT2) or {})[1]
+assert(gpu, "No GPU PCI device found")
+
+gpu:bindScreen(screen)
+
+-- === 2.  SCREEN SIZE ===
+local size = gpu:getScreenSize(screen)
+local ScreenX, ScreenY = size.x, size.y
+print("Screen:", ScreenX, "x", ScreenY)
+
+-- === 3.  SMALL HELPERS ===
+local WHITE = {r=1,g=1,b=1,a=1}
+local GRAY  = {r=0.2,g=0.2,b=0.2,a=1}
+local BLUE  = {r=0.1,g=0.6,b=1,a=1}
+local GREEN = {r=0,g=1,b=0.4,a=1}
+
+local function clear(color)
+  gpu:drawBox({
+    pos  = {x=0, y=0},
+    size = {x=ScreenX, y=ScreenY},
+    color= color or {r=0,g=0,b=0,a=1},
+    image = nil
+  })
+end
+
+local function text(x,y,str,size,col,mono)
+  gpu:drawText({x=x,y=y}, str, size or 20, col or WHITE, mono==nil and true or mono)
+end
+
+-- === 4.  INVENTORY SCAN ===
+local NAME_FILTER_PREFIX = nil    -- set to "DEPOT" if you only want those
+
+local function has(o,m) return o and type(o[m])=="function" end
+local function try(fn, ...) local ok,r = pcall(fn, ...); if ok then return r end end
+local function invStacks(inv)
+  if has(inv,"getItemStacks") then return try(inv.getItemStacks,inv) or {} end
+  if has(inv,"getStacks")     then return try(inv.getStacks,inv) or {} end
+  if has(inv,"getAllStacks")  then return try(inv.getAllStacks,inv) or {} end
+  return {}
+end
+local function getNameOrClass(c)
+  if has(c,"getName") then return try(c.getName,c) end
+  if has(c,"getTag")  then return try(c.getTag,c) end
+  if c and c.type then return tostring(c.type) end
+  return "Unknown"
+end
+
+-- find all inventory-bearing components
+local all = component.findComponent("") or {}
+local containers = {}
+for _,id in ipairs(all) do
+  local c = component.proxy(id)
+  if c and has(c,"getInventories") then
+    if NAME_FILTER_PREFIX then
+      local nm = getNameOrClass(c) or ""
+      if nm:find("^"..NAME_FILTER_PREFIX) then containers[#containers+1]=c end
+    else containers[#containers+1]=c end
+  end
+end
+
+-- aggregate totals
+local totals, totalItems, invCount = {}, 0, 0
+for _,c in ipairs(containers) do
+  for _,inv in ipairs(try(c.getInventories,c) or {}) do
+    invCount = invCount + 1
+    for _,st in pairs(invStacks(inv)) do
+      local cnt = st.count or st.quantity or st.amount or 0
+      local name = (st.item and (st.item.name or st.item.localizedName)) or st.name or st.displayName or "Unknown"
+      if cnt>0 then
+        totals[name] = (totals[name] or 0) + cnt
+        totalItems = totalItems + cnt
+      end
+    end
+  end
+end
+local contCount = #containers
+
+-- sort
+local items = {}
+for n,cnt in pairs(totals) do items[#items+1]={name=n,count=cnt} end
+table.sort(items,function(a,b) if a.count==b.count then return a.name<b.name end return a.count>b.count end)
+
+-- === 5.  DRAW UI ===
+clear(GRAY)
+
+local margin = 30
+local lineH  = 28
+local font   = 24
+local y = margin
+
+-- header bar
+gpu:drawBox({pos={x=0,y=0},size={x=ScreenX,y=60},color=BLUE,image=nil})
+text(20,15,"Dimensional Depot Status",32,WHITE,true)
+
+y = 80
+text(margin, y, ("Containers: %d   Inventories: %d   Total Items: %d"):format(contCount,invCount,totalItems), 22, WHITE,true)
+y = y + 30
+
+-- column headers
+local colNameW = math.floor(ScreenX*0.7)
+local colQtyW  = ScreenX - colNameW - margin*2
+text(margin, y, "Item", 22, GREEN,true)
+text(ScreenX - colQtyW - margin, y, "Qty", 22, GREEN,true)
+y = y + 8
+gpu:drawBox({pos={x=margin,y=y},size={x=ScreenX-margin*2,y=2},color=GREEN,image=nil})
+y = y + 10
+
+-- show top N (or all)
+local showN = math.min(#items, 20)
+for i=1,showN do
+  local it = items[i]
+  text(margin, y, it.name, font, WHITE,true)
+  text(ScreenX - colQtyW - margin, y, tostring(it.count), font, WHITE,true)
+  y = y + lineH
+end
+
+gpu:flush()
+print("Depot status drawn successfully!")
