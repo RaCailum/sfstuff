@@ -1,0 +1,299 @@
+-- ==========================================================
+--  Inventory Status with Per-Item Text Bars and Container Capacity
+--  Shows fullness of each item relative to one container's capacity
+--  Refreshes every REFRESH_INTERVAL seconds
+-- ==========================================================
+
+-- === Adjustable settings ===
+local REFRESH_INTERVAL = 5       -- seconds between updates
+local MAX_ROWS = 100              -- number of item rows to display
+local BAR_SEGMENTS = 40          -- number of segments in the text bar
+local FULL_SYMBOL   = "|"        -- symbol for filled segments
+local EMPTY_SYMBOL  = "-"        -- symbol for empty segments
+
+-- === Customizable font sizes and margins ===
+-- Font size for each item row (applies to item names, bars, and current/capacity text)
+local ITEM_FONT_SIZE = 15
+-- Vertical space added below each item row (row height = ITEM_FONT_SIZE + ROW_V_MARGIN)
+local ROW_V_MARGIN  = 8
+-- Horizontal space between the item name and its progress bar
+local NAME_BAR_MARGIN = 5
+-- Horizontal space between the progress bar and the current/capacity text
+local BAR_QTY_MARGIN  = 5
+
+-- Define a global margin for UI layout so it is available if referenced outside functions
+local MARGIN = 30
+
+-- === Colour customisation ===
+-- These tables control the colours used throughout the UI.  Adjust the RGB values (0–1)
+-- to customise the look of your display.  Alpha (a) should remain 1 for opaque text.
+local COLOR_BACKGROUND    = {r=0.0, g=0.25, b=0.0, a=1}    -- screen background
+local COLOR_HEADER_BG     = {r=0.1, g=0.6, b=1.0, a=1}      -- header bar background
+local COLOR_HEADER_TEXT   = {r=1.0, g=1.0, b=1.0, a=1}      -- header bar text
+local COLOR_TEXT          = {r=1.0, g=1.0, b=1.0, a=1}      -- regular item text
+local COLOR_CATEGORY_TEXT = {r=0.0, g=1.0, b=0.4, a=1}      -- category headers and labels
+local COLOR_BAR_FILLED    = {r=1.0, g=0.64, b=0, a=1}      -- filled portion of per‑item bar
+local COLOR_BAR_EMPTY     = {r=0.3, g=0.3, b=0.3, a=1}      -- empty portion of per‑item bar (unused when using a single draw call)
+local COLOR_BAR_BRACKET   = {r=1.0, g=0.0, b=0.0, a=1}      -- colour for the [ and ] caps around the bar
+
+-- === Category filtering and grouping ===
+-- Set GROUP_BY_CATEGORY to true to group items by their ItemCategory and display a
+-- heading for each category.  When false the list is sorted by count regardless of category.
+local GROUP_BY_CATEGORY = true
+
+-- CATEGORY_FILTER can be nil (to show all categories) or a table whose keys are the
+-- category names you wish to display.  For example:
+--   local CATEGORY_FILTER = { ["Resource"] = true, ["Component"] = true }
+-- The name used here comes from item.type.category.name.  Leave as nil to disable filtering.
+local CATEGORY_FILTER = nil
+
+-- Font size for category headers (only used when GROUP_BY_CATEGORY is true)
+local CATEGORY_HEADER_FONT_SIZE = 20
+-- Vertical spacing before a new category header is drawn
+local CATEGORY_HEADER_MARGIN_Y  = 4
+
+-- === 1) Bind Screen + GPU ===
+local screen = component.proxy(component.findComponent(classes.Screen)[1]) or
+               component.proxy(component.findComponent(classes.Build_Screen_C)[1])
+assert(screen, "No Screen component found")
+
+local gpu = (computer.getPCIDevices(classes.GPU_T2_C) or {})[1] or
+            (computer.getPCIDevices(classes.Build_GPU_T2_C) or {})[1] or
+            (computer.getPCIDevices(classes.FINComputerGPUT2) or {})[1]
+assert(gpu, "No GPU PCI device found")
+gpu:bindScreen(screen)
+
+-- === 2) Screen helpers ===
+local size = gpu:getScreenSize(screen)
+local ScreenX, ScreenY = size.x, size.y
+local WHITE   = {r=1,g=1,b=1,a=1}
+local GRAY    = {r=0.2,g=0.2,b=0.2,a=1}
+local BLUE    = {r=0.1,g=0.6,b=1,a=1}
+local GREEN   = {r=0,g=1,b=0.4,a=1}
+local PROG_BG = {r=0.3,g=0.3,b=0.3,a=1}
+
+local function clear(color)
+  gpu:drawBox({pos={x=0,y=0}, size={x=ScreenX,y=ScreenY}, color=color or {r=0,g=0,b=0,a=1}})
+end
+local function text(x,y,str,size,col,mono)
+  gpu:drawText({x=x,y=y}, str, size or 20, col or WHITE, mono==nil and true or mono)
+end
+
+-- helper to format numbers as k/M (e.g. 60000 -> "60k")
+local function fmtNumber(n)
+  local absn = math.abs(n)
+  if absn >= 1e6 then
+    return string.format("%.1fM", n / 1e6)
+  elseif absn >= 1e3 then
+    return string.format("%.1fk", n / 1e3)
+  else
+    return tostring(n)
+  end
+end
+
+-- safely get the maximum stack size of an item type
+local function getStackSize(itemType)
+  if not itemType then return 100 end
+  -- direct property
+  local ok, val = pcall(function() return itemType.max end)
+  if ok and type(val) == "number" then return val end
+  -- try a getter method
+  local ok2, val2 = pcall(function() return itemType.getMax and itemType:getMax() end)
+  if ok2 and type(val2) == "number" then return val2 end
+  return 100
+end
+
+-- === 3) Main update function ===
+local function updateScreen()
+  -- 3a. Scan storages
+  local containerIDs = component.findComponent(classes.FGBuildableStorage)
+  local containers    = component.proxy(containerIDs) or {}
+  local totals, types = {}, {}
+  local totalItems, invCount = 0, 0
+  local usedSlots, totalSlots = 0, 0
+
+  -- determine slots per container (use first found)
+  local slotsPerContainer = 24
+  if containers[1] then
+    local firstInv = containers[1]:getInventories()[1]
+    if firstInv then
+      slotsPerContainer = firstInv.size or (firstInv.getSize and firstInv:getSize()) or 24
+    end
+  end
+
+  for _, c in ipairs(containers) do
+    local inv = c:getInventories()[1]
+    if inv then
+      invCount = invCount + 1
+      local size = inv.size or (inv.getSize and inv:getSize()) or 0
+      totalSlots = totalSlots + size
+      for slot = 0, size - 1 do
+        local stack = inv:getStack(slot)
+        if stack and stack.count and stack.count > 0 then
+          usedSlots = usedSlots + 1
+          local itm  = stack.item
+          local typ  = itm and itm.type
+          local hash = typ and typ.hash
+          if hash then
+            totals[hash] = (totals[hash] or 0) + stack.count
+            types[hash]  = typ
+            totalItems   = totalItems + stack.count
+          end
+        end
+      end
+    end
+  end
+
+  -- 3b. Collect items, apply category info and optional filter
+  local items = {}
+  for hash, count in pairs(totals) do
+    local itemType = types[hash]
+    local name = (itemType and itemType.name) or ("Unknown:"..tostring(hash))
+    -- Determine the category name of this item
+    local categoryName = "Unknown"
+    if itemType then
+      local okCat, categoryObj = pcall(function() return itemType.category end)
+      if okCat and categoryObj then
+        local okName, catName = pcall(function() return categoryObj.name end)
+        if okName and type(catName) == "string" then
+          categoryName = catName
+        end
+      end
+    end
+    -- Apply category filter if specified
+    if (CATEGORY_FILTER == nil) or CATEGORY_FILTER[categoryName] then
+      items[#items+1] = {name=name, count=count, hash=hash, category=categoryName}
+    end
+  end
+  -- When not grouping by category, sort items by count (desc) then name (asc)
+  if not GROUP_BY_CATEGORY then
+    table.sort(items, function(a,b)
+      return a.count == b.count and a.name < b.name or a.count > b.count
+    end)
+  end
+
+  -- 3c. Compute overall slot utilization
+  local overall = (totalSlots > 0) and (usedSlots / totalSlots) or 0
+
+  -- === 4) Draw UI ===
+  -- Clear the screen with the customised background colour
+  clear(COLOR_BACKGROUND)
+
+  -- header bar
+  gpu:drawBox({pos={x=0,y=0}, size={x=ScreenX,y=60}, color=COLOR_HEADER_BG})
+  text(20,15,"Container Network Status", 32, COLOR_HEADER_TEXT, true)
+
+  -- summary line (use global MARGIN)
+  local y = 80
+  text(MARGIN, y, ("Containers: %d   Inventories: %d   Total Items: %d"):format(
+         #containers, invCount, totalItems), 22, COLOR_TEXT, true)
+  y = y + 30
+
+  -- overall slots bar
+  local barW = ScreenX - MARGIN*2
+  local barH = 20
+  local fillW = math.floor(barW * overall + 0.5)
+  -- draw bar background and fill using custom colours
+  gpu:drawBox({pos={x=MARGIN, y=y}, size={x=barW, y=barH}, color=COLOR_BAR_EMPTY})
+  gpu:drawBox({pos={x=MARGIN, y=y}, size={x=fillW, y=barH}, color=COLOR_BAR_FILLED})
+  text(MARGIN+5, y+2, ("Slots: %d/%d (%.1f%%)"):format(
+         usedSlots, totalSlots, overall*100), 16, COLOR_TEXT, true)
+  y = y + barH + 20
+
+  -- === Per‑item rows ===
+  -- Determine column widths: name + bar + qty text
+  local availW   = ScreenX - MARGIN*2
+  local nameW    = math.floor(availW * 0.25)  -- 25% for name
+  local barWidth = math.floor(availW * 0.45)  -- 45% for bar string area
+  local qtyW     = availW - nameW - barWidth
+
+  local rowFont  = ITEM_FONT_SIZE
+  local rowH     = ITEM_FONT_SIZE + ROW_V_MARGIN
+
+  -- Column headers
+  text(MARGIN, y, "Item", 22, COLOR_CATEGORY_TEXT, true)
+  text(MARGIN + nameW + barWidth, y, "Current / Capacity", 22, COLOR_CATEGORY_TEXT, true)
+  y = y + 8
+  gpu:drawBox({pos={x=MARGIN, y=y}, size={x=availW, y=2}, color=COLOR_CATEGORY_TEXT})
+  y = y + 10
+
+  -- list items (optionally grouped by category) with text‑based container‑fullness bars
+  if GROUP_BY_CATEGORY then
+    -- group items into categories
+    local groups = {}
+    for _, it in ipairs(items) do
+      local cat = it.category or "Unknown"
+      if not groups[cat] then groups[cat] = {} end
+      table.insert(groups[cat], it)
+    end
+    -- sort categories alphabetically
+    local sortedCats = {}
+    for catName, _ in pairs(groups) do table.insert(sortedCats, catName) end
+    table.sort(sortedCats)
+    -- keep track of how many rows printed to respect MAX_ROWS
+    local printed = 0
+    for _, catName in ipairs(sortedCats) do
+      if printed >= MAX_ROWS then break end
+      local catItems = groups[catName]
+      -- sort items within category by count desc then name asc
+      table.sort(catItems, function(a,b) return a.count == b.count and a.name < b.name or a.count > b.count end)
+      -- print category header
+      text(MARGIN, y, catName, CATEGORY_HEADER_FONT_SIZE, COLOR_CATEGORY_TEXT, true)
+      y = y + CATEGORY_HEADER_FONT_SIZE + CATEGORY_HEADER_MARGIN_Y
+      -- print items in this category
+      for _, it in ipairs(catItems) do
+        if printed >= MAX_ROWS then break end
+        -- find stack size (max items per slot) for this item
+        local maxStack = getStackSize(types[it.hash])
+        local maxCap   = slotsPerContainer * maxStack
+        local pct      = math.min(it.count, maxCap) / maxCap
+        -- left: item name
+        text(MARGIN, y, it.name, rowFont, COLOR_TEXT, true)
+        -- middle: progress bar string with brackets
+        local filledSegments = math.floor(pct * BAR_SEGMENTS + 0.5)
+        local barCore = string.rep(FULL_SYMBOL, filledSegments) .. string.rep(EMPTY_SYMBOL, BAR_SEGMENTS - filledSegments)
+        local barString = "[" .. barCore .. "]"
+        local barX = MARGIN + nameW + NAME_BAR_MARGIN
+        text(barX, y, barString, rowFont, COLOR_BAR_FILLED, true)
+        -- right: quantity text
+        local qtyStr = fmtNumber(it.count) .. "/" .. fmtNumber(maxCap)
+        local qtyX = MARGIN + nameW + barWidth + BAR_QTY_MARGIN
+        text(qtyX, y, qtyStr, rowFont, COLOR_TEXT, true)
+        y = y + rowH
+        printed = printed + 1
+        if printed >= MAX_ROWS then break end
+      end
+    end
+  else
+    -- When not grouping by category, simply iterate through the sorted list
+    local showN = math.min(#items, MAX_ROWS)
+    for i=1, showN do
+      local it = items[i]
+      -- find stack size (max items per slot) for this item
+      local maxStack = getStackSize(types[it.hash])
+      local maxCap   = slotsPerContainer * maxStack
+      local pct      = math.min(it.count, maxCap) / maxCap
+      -- left: item name
+      text(MARGIN, y, it.name, rowFont, COLOR_TEXT, true)
+      -- middle: progress bar string, enclosed in square brackets
+      local filledSegments = math.floor(pct * BAR_SEGMENTS + 0.5)
+      local barCore = string.rep(FULL_SYMBOL, filledSegments) .. string.rep(EMPTY_SYMBOL, BAR_SEGMENTS - filledSegments)
+      local barString = "[" .. barCore .. "]"
+      local barX = MARGIN + nameW + NAME_BAR_MARGIN
+      text(barX, y, barString, rowFont, COLOR_BAR_FILLED, true)
+      -- right: quantity text
+      local qtyStr = fmtNumber(it.count) .. "/" .. fmtNumber(maxCap)
+      local qtyX = MARGIN + nameW + barWidth + BAR_QTY_MARGIN
+      text(qtyX, y, qtyStr, rowFont, COLOR_TEXT, true)
+      y = y + rowH
+    end
+  end
+
+  gpu:flush()
+end
+
+-- === 5) Periodic update loop ===
+while true do
+  updateScreen()
+  event.pull(REFRESH_INTERVAL)  -- 'event' is global in FN; no require()
+end
