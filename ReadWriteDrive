@@ -1,0 +1,15 @@
+local fs = filesystem
+local disk_uuid = "ACD8DE3945CBD85BB32213969A308D5D"
+
+
+fs.initFileSystem("/dev")
+
+
+
+fs.mount("/dev/"..disk_uuid, "/")
+
+
+
+local f = fs.open("/test.txt", "w")
+f:write("EAT A PEWP!")
+f:close()
