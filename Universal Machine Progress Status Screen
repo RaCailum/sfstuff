@@ -1,0 +1,515 @@
+-- ==========================================================
+--  Universal Machine Progress Status Screen
+--  Monitors all manufacturer buildings (Constructors, Assemblers,
+--  Blenders, Packagers, Refineries, etc.) and displays a progress
+--  bar for each machine's current production cycle.
+--
+--  This script is designed for the FicsIt‑Networks mod in
+--  Satisfactory.  It searches for all machines that expose a
+--  `progress` property (via the `Factory` class) and draws a
+--  segmented progress bar for each.  Colour themes, bar length,
+--  font sizes and layout spacings can all be customised from
+--  the variables defined near the top of this file.
+--
+--  NOTE: Depending on your mod versions, the class name for
+--  manufacturers may vary.  By default this script attempts to
+--  find components of the `Factory`, `Manufacturer` and
+--  `FGBuildableManufacturer` classes.  If your machines are not
+--  detected, add the appropriate class names to the
+--  `MACHINE_CLASSES` table below.
+-- ==========================================================
+
+-- === Customisation Options ===
+
+-- Refresh interval in seconds.  The display will update at this
+-- interval to reflect new machine progress states.
+local REFRESH_INTERVAL = 1
+
+-- Maximum number of rows to show on screen.  If you have more
+-- machines than this, only the first MAX_ROWS sorted by name will
+-- be displayed.  Adjust to fit your screen height.
+local MAX_ROWS = 25
+
+-- Font size for machine names, progress bars and percentage
+-- values.  Increase or decrease for readability.
+local ITEM_FONT_SIZE = 20
+
+-- Vertical margin between successive rows, in pixels.  This is
+-- added to the font height to compute the row height.
+local ROW_V_MARGIN = 15
+
+-- Horizontal gap between the name column and the progress bar, in
+-- pixels.
+local NAME_BAR_MARGIN = 0
+
+-- Horizontal gap between the progress bar and the percentage
+-- column, in pixels.
+local BAR_PERCENT_MARGIN = 400
+
+-- Number of segments used for each progress bar.  Higher values
+-- produce smoother bars but take more horizontal space.
+local BAR_SEGMENTS = 20
+
+-- Symbols used to draw the progress bar.  FULL_SYMBOL is used for
+-- filled segments and EMPTY_SYMBOL for empty segments.  Brackets
+-- are drawn around the bar automatically.
+local FULL_SYMBOL = "|"
+local EMPTY_SYMBOL = " "
+
+-- Character width factor used when computing pixel offsets for the
+-- progress bar.  FicsIt‑Networks renders monospaced text at
+-- approximately 0.6 times the font size.  This factor is used to
+-- convert from segment counts to pixel offsets when drawing the
+-- progress bar so that the right bracket appears at the end of the
+-- bar rather than being stuck at the beginning.  You may need to
+-- tweak this value slightly if your font renders wider or narrower.
+local BAR_CHAR_WIDTH_FACTOR = .8
+
+-- Colour definitions.  Colours are tables with r, g, b, a fields
+-- each ranging from 0.0 to 1.0.  Adjust these values to change
+-- the look of the display.  You can also duplicate any colour if
+-- you want matching themes.
+local BG_COLOR         = {r=0.05, g=0.05, b=0.05, a=1.0}  -- Screen background
+local HEADER_BG_COLOR  = {r=0.10, g=0.60, b=1.00, a=1.0}  -- Header bar colour
+local HEADER_TEXT_COLOR= {r=1.00, g=1.00, b=1.00, a=1.0}  -- Header text colour
+local TEXT_COLOR       = {r=1.00, g=1.00, b=1.00, a=1.0}  -- Default text colour
+local NAME_COLOR       = TEXT_COLOR                        -- Machine name colour
+local BAR_FULL_COLOR   = {r=0.00, g=0.90, b=0.30, a=1.0}  -- Colour for filled bar segments
+local BAR_EMPTY_COLOR  = {r=0.30, g=0.30, b=0.30, a=1.0}  -- Colour for empty bar segments
+local BRACKET_COLOR    = {r=0.80, g=0.80, b=0.80, a=1.0}  -- Colour for brackets around bars
+local PERCENT_COLOR    = TEXT_COLOR                        -- Colour for percentage text
+
+-- Show the machine's current recipe name instead of the machine name.  When
+-- enabled, the script will attempt to determine what the manufacturer is
+-- currently producing by calling its getRecipe() method and reading the
+-- products of that recipe.  If disabled, or if no recipe information is
+-- available, the script falls back to displaying the machine's name.
+local SHOW_PRODUCT_NAME = true
+
+-- Group machines by type.  When true, machines will be grouped under
+-- headings based on their building class (e.g. Constructor, Assembler,
+-- Blender).  The grouping is determined by searching the class name for
+-- keywords defined in MACHINE_TYPE_PATTERNS.  If false, all machines are
+-- listed in a single list sorted by name.
+local GROUP_BY_MACHINE_TYPE = false
+
+-- Patterns used to detect machine types from their class names.  Each entry
+-- is a two‑element array: the first element is a substring to search for
+-- within the class name, and the second element is the display name for
+-- that group.  The search is case sensitive.  If no pattern matches,
+-- machines fall into the "Other" group.  Add or adjust patterns as
+-- required for your mod setup.
+local MACHINE_TYPE_PATTERNS = {
+  {"Constructor", "Constructor"},
+  {"Assembler",   "Assembler"},
+  {"Blender",     "Blender"},
+  {"Packager",    "Packager"},
+  {"Refinery",    "Refinery"},
+  {"Manufacturer","Manufacturer"},
+}
+
+-- Colour for group headers when GROUP_BY_MACHINE_TYPE is enabled.  Use this
+-- colour to draw the group name at the start of each section.
+local GROUP_HEADER_COLOR = {r=0.90, g=0.90, b=0.90, a=1.0}
+
+-- Machine class definitions.  Populate this table with all
+-- component classes you want to monitor.  By default we attempt
+-- several classes commonly used for manufacturing buildings.  If
+-- some machines are missing from the display, add their class
+-- names here.  You can obtain class names from the Reflection
+-- viewer or by inspecting existing components via FicsIt‑Networks.
+local MACHINE_CLASSES = {
+  classes.Factory,            -- Generic factory class
+  classes.Manufacturer,       -- Alternative name for manufacturer base class
+  classes.FGBuildableManufacturer,  -- Another common base class
+  -- Add specific building classes below if needed, e.g.:
+  -- classes.Build_ConstructorMk1_C,
+  -- classes.Build_AssemblerMk1_C,
+  -- classes.Build_Blender_C,
+  -- classes.Build_Packager_C,
+  -- classes.Build_Refinery_C,
+  -- classes.Build_ManufacturerMk1_C,
+}
+
+-- === End of Customisation Options ===
+
+
+-- === Set up the screen and GPU ===
+
+-- Find a screen component.  First attempt to locate a generic
+-- screen, then fall back to the Build_Screen_C variant.  Raise an
+-- error if none are found.
+local screen = component.proxy(component.findComponent(classes.Screen)[1])
+if not screen then
+  screen = component.proxy(component.findComponent(classes.Build_Screen_C)[1])
+end
+assert(screen, "No Screen component found")
+
+-- Find a GPU device.  We search for tier‑2 GPUs first because they
+-- offer better capabilities, then fall back to Build_GPU_T2_C or
+-- FINComputerGPUT2.  If none are found, the script will error.
+local gpu = (computer.getPCIDevices(classes.GPU_T2_C) or {})[1] or
+            (computer.getPCIDevices(classes.Build_GPU_T2_C) or {})[1] or
+            (computer.getPCIDevices(classes.FINComputerGPUT2) or {})[1]
+assert(gpu, "No GPU PCI device found")
+
+-- Bind the GPU to the screen for drawing.
+gpu:bindScreen(screen)
+
+-- Get the screen dimensions once; they won't change at runtime.
+local size = gpu:getScreenSize(screen)
+local ScreenX, ScreenY = size.x, size.y
+
+-- Horizontal margin at the left/right edges of the screen.  This
+-- margin is independent of NAME_BAR_MARGIN and BAR_PERCENT_MARGIN.
+local MARGIN = 30
+
+-- Compute a row height based on the font size and the vertical
+-- margin.  The row height includes the font height and the
+-- additional spacing below it.
+local function rowHeight(fontSize)
+  return fontSize + ROW_V_MARGIN
+end
+
+-- A helper to draw text on the screen.  Wraps gpu:drawText and
+-- applies the provided colour and monospace flag.  If mono is
+-- omitted, the font will default to monospaced.
+local function drawText(x, y, str, fontSize, colour, mono)
+  gpu:drawText({x=x, y=y}, str, fontSize or ITEM_FONT_SIZE, colour or TEXT_COLOR, mono==nil and true or mono)
+end
+
+-- Helper for drawing a horizontal bar as two overlapped text
+-- calls.  First draws the empty bar in BAR_EMPTY_COLOR, then
+-- overlays the filled portion in BAR_FULL_COLOR.  Brackets are
+-- drawn before and after the bar using BRACKET_COLOR.  The caller
+-- supplies the x/y position and the filled segment count.  The
+-- total number of segments is taken from BAR_SEGMENTS.
+local function drawProgressBar(x, y, filled)
+  -- Constrain filled to a valid range
+  if filled < 0 then filled = 0 end
+  if filled > BAR_SEGMENTS then filled = BAR_SEGMENTS end
+  -- Compute an approximate pixel width per character based on the
+  -- font size and BAR_CHAR_WIDTH_FACTOR.  The factor converts the
+  -- font size (height) into an estimated width.  Round to nearest
+  -- integer for pixel alignment.
+  local charW = math.floor(ITEM_FONT_SIZE * BAR_CHAR_WIDTH_FACTOR + 0.5)
+  -- Build the strings for empty and filled segments
+  local emptyCount = BAR_SEGMENTS - filled
+  local fullStr    = string.rep(FULL_SYMBOL, filled)
+  local emptyStr   = string.rep(EMPTY_SYMBOL, emptyCount)
+  -- Draw left bracket
+  drawText(x, y, "[", ITEM_FONT_SIZE, BRACKET_COLOR, true)
+  -- Compute starting x for the bar content (immediately after the left bracket)
+  local barStartX = x + charW
+  -- Draw filled segments
+  if #fullStr > 0 then
+    drawText(barStartX, y, fullStr, ITEM_FONT_SIZE, BAR_FULL_COLOR, true)
+  end
+  -- Draw empty segments after the filled ones
+  if #emptyStr > 0 then
+    -- Starting x position for empty segments
+    local emptyX = barStartX + charW * filled
+    drawText(emptyX, y, emptyStr, ITEM_FONT_SIZE, BAR_EMPTY_COLOR, true)
+  end
+  -- Draw right bracket.  It should be placed after all bar segments.
+  local rightBracketX = x + charW * (BAR_SEGMENTS + 1)
+  drawText(rightBracketX, y, "]", ITEM_FONT_SIZE, BRACKET_COLOR, true)
+end
+
+-- Helper to format a percentage value.  Returns a string like
+-- "37.5%" with one decimal place.  Input is a fraction between 0
+-- and 1.
+local function fmtPercent(frac)
+  return string.format("%.1f%%", (frac or 0) * 100)
+end
+
+-- === Main update routine ===
+-- This function scans all machines, collects their names and
+-- progress values, sorts them, and draws the display on screen.
+local function updateScreen()
+  -- 1. Collect machine instances
+  local machineIDs = {}
+  -- For each class in MACHINE_CLASSES, gather all matching components
+  for _, class in ipairs(MACHINE_CLASSES) do
+    if class then
+      local ids = component.findComponent(class) or {}
+      for i=1,#ids do
+        machineIDs[#machineIDs+1] = ids[i]
+      end
+    end
+  end
+
+  -- Proxy all unique machine IDs (avoid duplicates).  Use a set to
+  -- de‑duplicate component IDs because some machines may inherit
+  -- multiple classes.
+  local seen = {}
+  local machines = {}
+  for _, id in ipairs(machineIDs) do
+    if not seen[id] then
+      seen[id] = true
+      local m = component.proxy(id)
+      if m then
+        machines[#machines+1] = m
+      end
+    end
+  end
+
+  -- 2. Extract display data: name or product, progress fraction and machine type
+  -- If SHOW_PRODUCT_NAME is true, we attempt to derive the currently
+  -- producing item name from the machine's recipe.  Additionally,
+  -- GROUP_BY_MACHINE_TYPE controls whether machines are grouped by their
+  -- class type.
+  local entries = {}
+  for _, m in ipairs(machines) do
+    -- Determine the entry name.  This may be either the recipe's product
+    -- name or the machine's own name depending on SHOW_PRODUCT_NAME.
+    local entryName
+    if SHOW_PRODUCT_NAME then
+      -- Attempt to get the current recipe via getRecipe().  Use pcall to
+      -- suppress warnings if the method is missing.
+      local okR, recipe = pcall(function() return m.getRecipe and m:getRecipe() end)
+      if okR and recipe then
+        -- Obtain products from the recipe.  Use a safe guard to avoid
+        -- indexing non‑existent methods.  If getProducts() doesn't exist
+        -- on the recipe, the call simply returns nil.
+        local okP, products = pcall(function()
+          if recipe.getProducts then
+            return recipe:getProducts()
+          end
+          return nil
+        end)
+        if okP and type(products) == "table" and #products > 0 then
+          local ia = products[1]
+          -- Try to get the item type from the ItemAmount
+          local okType, itype = pcall(function() return ia.type end)
+          if okType and itype then
+            -- Attempt to read a user‑friendly name from the ItemType
+            local okName, nVal = pcall(function() return itype.name end)
+            if okName and nVal and nVal ~= "" then
+              entryName = tostring(nVal)
+            else
+              -- Fallback: use type description or internalName if available
+              local okDesc, descVal = pcall(function() return itype.description end)
+              if okDesc and descVal and descVal ~= "" then
+                entryName = tostring(descVal)
+              else
+                -- Final fallback: string representation of the item type
+                entryName = tostring(itype)
+              end
+            end
+          end
+        end
+      end
+    end
+    -- If SHOW_PRODUCT_NAME failed or disabled, fall back to machine's name
+    if not entryName then
+      -- Use the component's nick if set
+      local okNick, nickVal = pcall(function() return m.nick end)
+      if okNick and nickVal and nickVal ~= "" then
+        entryName = tostring(nickVal)
+      end
+    end
+    if not entryName then
+      -- Try internalName for buildable actors
+      local okInternal, internalVal = pcall(function() return m.internalName end)
+      if okInternal and internalVal and internalVal ~= "" then
+        entryName = tostring(internalVal)
+      end
+    end
+    if not entryName then
+      -- Try the proxy id as a fallback
+      local okId, idVal = pcall(function() return m.id end)
+      if okId and idVal then
+        entryName = tostring(idVal)
+      end
+    end
+    if not entryName then
+      -- Last resort: derive a fallback string from the class type.  Avoid
+      -- calling tostring() directly on the class object because its
+      -- __tostring metamethod may attempt to use getName() (which often
+      -- doesn't exist).  Instead, attempt to read safe fields like
+      -- internalName or name.  If none are present, fall back to
+      -- "Unknown".
+      local okClass, classObj = pcall(function() return m.getType and m:getType() end)
+      if okClass and classObj then
+        -- Try internalName field
+        local okCn, cname = pcall(function() return classObj.internalName end)
+        if okCn and cname and cname ~= "" then
+          entryName = tostring(cname)
+        else
+          -- Try name field
+          local okNm, nm = pcall(function() return classObj.name end)
+          if okNm and nm and nm ~= "" then
+            entryName = tostring(nm)
+          else
+            -- Try nickname field
+            local okNi, ni = pcall(function() return classObj.nick end)
+            if okNi and ni and ni ~= "" then
+              entryName = tostring(ni)
+            else
+              entryName = nil
+            end
+          end
+        end
+      end
+    end
+    entryName = entryName or "Unknown"
+
+    -- Obtain progress value.  Use the Factory `progress` property if present,
+    -- otherwise fall back to a getProgress() method【720008858401267†L528-L540】.
+    local progress = 0.0
+    -- Try property access
+    local okp, vp = pcall(function() return m.progress end)
+    if okp and type(vp) == "number" then
+      progress = vp
+    else
+      -- Try getProgress method
+      local okm, vm = pcall(function() return m.getProgress and m:getProgress() end)
+      if okm and type(vm) == "number" then
+        progress = vm
+      end
+    end
+    -- Clamp progress to [0,1]
+    if progress < 0 then progress = 0 end
+    if progress > 1 then progress = 1 end
+
+    -- Determine the group name based on machine type if grouping is enabled
+    local groupName = ""
+    if GROUP_BY_MACHINE_TYPE then
+      -- Derive class name via getType(); avoid getName() which may not exist
+      local okClass, classObj = pcall(function() return m.getType and m:getType() end)
+      if okClass and classObj then
+        -- Avoid calling getName() on the class object as it may not exist.  Try
+        -- to derive a class name from safe fields like internalName or name.
+        local className
+        if classObj then
+          local okCn, cname = pcall(function() return classObj.internalName end)
+          if okCn and cname and cname ~= "" then
+            className = tostring(cname)
+          else
+            local okNm, nm = pcall(function() return classObj.name end)
+            if okNm and nm and nm ~= "" then
+              className = tostring(nm)
+            else
+              className = nil
+            end
+          end
+        end
+        -- Match patterns on the className string (if any)
+        if className then
+          local matched = false
+          for _, patt in ipairs(MACHINE_TYPE_PATTERNS) do
+            local sub, disp = patt[1], patt[2]
+            if string.find(className, sub) then
+              groupName = disp
+              matched = true
+              break
+            end
+          end
+          if not matched then
+            groupName = "Other"
+          end
+        else
+          groupName = "Other"
+        end
+      else
+        groupName = "Other"
+      end
+    end
+    -- Record the entry.  Each entry contains name, progress and group.
+    entries[#entries+1] = {name=entryName, progress=progress, group=groupName}
+  end
+
+  -- 3. Group entries if requested.  We create a map from groupName
+  -- to an array of entries.  If grouping is disabled, all entries
+  -- are placed into a single unnamed group.
+  local grouped = {}
+  if GROUP_BY_MACHINE_TYPE then
+    for _, e in ipairs(entries) do
+      local g = e.group or "Other"
+      if not grouped[g] then grouped[g] = {} end
+      table.insert(grouped[g], e)
+    end
+  else
+    grouped[""] = entries
+  end
+
+  -- Sort group keys alphabetically for consistent ordering (empty string
+  -- group will sort first).  Then sort entries within each group by name.
+  local groupKeys = {}
+  for g, _ in pairs(grouped) do
+    table.insert(groupKeys, g)
+  end
+  table.sort(groupKeys, function(a,b) return a < b end)
+  for _, g in ipairs(groupKeys) do
+    table.sort(grouped[g], function(a,b) return a.name < b.name end)
+  end
+
+  -- 4. Draw the UI
+  -- Clear the background
+  gpu:drawBox({pos={x=0,y=0}, size={x=ScreenX,y=ScreenY}, color=BG_COLOR, image=nil})
+  -- Draw header bar
+  gpu:drawBox({pos={x=0,y=0}, size={x=ScreenX, y=60}, color=HEADER_BG_COLOR, image=nil})
+  drawText(20, 15, "Machine Progress Status", 32, HEADER_TEXT_COLOR, true)
+  -- Summary line: number of machines
+  local totalMachines = #entries
+  local summary = string.format("Machines: %d", totalMachines)
+  drawText(MARGIN, 80, summary, 22, HEADER_TEXT_COLOR, true)
+
+  -- Prepare layout calculations
+  local availW   = ScreenX - 2*MARGIN
+  -- Column widths: assign fractions to name/bar/percent
+  local nameW    = math.floor(availW * 0.30)  -- 30% for name
+  local barW     = math.floor(availW * 0.50)  -- 50% for bar (incl brackets)
+  local pctW     = availW - nameW - barW      -- remainder for percent
+  -- Starting y coordinate for the first row
+  local y = 110
+  -- Row height based on font size and vertical margin
+  local rH = rowHeight(ITEM_FONT_SIZE)
+
+  -- Column header row
+  drawText(MARGIN, y, GROUP_BY_MACHINE_TYPE and "Group / Item" or "Item", ITEM_FONT_SIZE, HEADER_TEXT_COLOR, true)
+  drawText(MARGIN + nameW + NAME_BAR_MARGIN + (BAR_SEGMENTS + 2) + BAR_PERCENT_MARGIN, y, "Progress", ITEM_FONT_SIZE, HEADER_TEXT_COLOR, true)
+  y = y + rH
+  -- Divider line below headers
+  gpu:drawBox({pos={x=MARGIN, y=y-ROW_V_MARGIN/2}, size={x=availW, y=2}, color=HEADER_TEXT_COLOR, image=nil})
+
+  -- Loop over groups and entries.  Respect MAX_ROWS across all groups.
+  local drawnRows = 0
+  for _, g in ipairs(groupKeys) do
+    local groupEntries = grouped[g]
+    if GROUP_BY_MACHINE_TYPE and g ~= "" then
+      -- Draw group header
+      if drawnRows < MAX_ROWS then
+        drawText(MARGIN, y, g, ITEM_FONT_SIZE, GROUP_HEADER_COLOR, true)
+        y = y + rH
+        drawnRows = drawnRows + 1
+      end
+    end
+    for _, e in ipairs(groupEntries) do
+      if drawnRows >= MAX_ROWS then break end
+      -- Draw name
+      drawText(MARGIN, y, e.name, ITEM_FONT_SIZE, NAME_COLOR, true)
+      -- Compute filled segments
+      local filled = math.floor(e.progress * BAR_SEGMENTS + 0.5)
+      -- Draw bar
+      local barX = MARGIN + nameW + NAME_BAR_MARGIN
+      drawProgressBar(barX, y, filled)
+      -- Draw percent text
+      local pctX = barX + (BAR_SEGMENTS + 2) + BAR_PERCENT_MARGIN
+      drawText(pctX, y, fmtPercent(e.progress), ITEM_FONT_SIZE, PERCENT_COLOR, true)
+      y = y + rH
+      drawnRows = drawnRows + 1
+    end
+    if drawnRows >= MAX_ROWS then break end
+  end
+  -- Flush drawing operations to the screen
+  gpu:flush()
+end
+
+-- === Main loop ===
+-- Periodically update the screen using the refresh interval.
+while true do
+  updateScreen()
+  event.pull(REFRESH_INTERVAL)
+end
