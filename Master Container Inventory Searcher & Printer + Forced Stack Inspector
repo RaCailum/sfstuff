@@ -1,0 +1,306 @@
+-- Master Container Inventory Searcher & Printer + Forced Stack Inspector
+local PRINT_PER_CONTAINER = true
+local PRINT_PER_SLOT      = false
+local ONLY_NETWORKED      = false
+local SEARCH_TERM         = nil
+
+-- How many non-empty stacks to force-inspect (one-time on run)
+local FORCE_INSPECT_FIRST_N = 6
+
+-- ===== UTIL =====
+local function safeFirstInventory(c)
+    local invs; pcall(function() invs = c:getInventories() end)
+    if type(invs) == "table" and invs[1] then return invs[1] end
+    return nil
+end
+
+local function getInvSize(inv)
+    if type(inv.size) == "number" then return inv.size end
+    local ok, v = pcall(function() return inv:getSize() end)
+    if ok and type(v) == "number" then return v end
+    return 0
+end
+
+local function getInvStack(inv, idx)
+    local try = { "getStack", "getItemStack", "get", "getSlot", "getItem" }
+    for _, m in ipairs(try) do
+        local ok, res = pcall(function() return inv[m](inv, idx) end)
+        if ok and res ~= nil then return res end
+    end
+    return nil
+end
+
+local function countUsedSlots(inv)
+    local used, size = 0, getInvSize(inv)
+    for i = 0, size - 1 do
+        local it = getInvStack(inv, i)
+        if it and it.count and it.count > 0 then used = used + 1 end
+    end
+    return used
+end
+
+local function matchesSearch(itemName)
+    if not SEARCH_TERM or SEARCH_TERM == "" then return true end
+    if not itemName then return false end
+    return string.find(string.lower(itemName), string.lower(SEARCH_TERM), 1, true) ~= nil
+end
+
+local function fmt(n)
+    local s = tostring(math.floor((n or 0) + 0.5))
+    local k; repeat s, k = s:gsub("^(-?%d+)(%d%d%d)", "%1,%2") until k == 0
+    return s
+end
+
+local function classToPretty(s)
+    if type(s) ~= "string" then return nil end
+    s = s:gsub("^BP[_%-]?ItemDesc[_%-]?", "")
+         :gsub("^Desc[_%-]?", "")
+         :gsub("_C$", "")
+    s = s:gsub("(%l)(%u)","%1 %2"):gsub("_"," "):gsub("%s+"," ")
+    s = s:gsub("(%a)(%w*)", function(a,b) return string.upper(a)..string.lower(b) end)
+    return s
+end
+
+-- Pretty print a shallow dump of a table (keys + primitive values)
+local function dumpTop(label, t)
+    if type(t) ~= "table" then
+        print(label .. " = <" .. type(t) .. "> " .. tostring(t))
+        return
+    end
+    local keys = {}
+    for k,_ in pairs(t) do table.insert(keys, tostring(k)) end
+    table.sort(keys)
+    print(label .. " {")
+    local shown = 0
+    for _,k in ipairs(keys) do
+        shown = shown + 1
+        if shown > 30 then print("  ..."); break end
+        local v = t[k]
+        local vt = type(v)
+        if vt == "table" then
+            local inner = {}
+            for ik,_ in pairs(v) do table.insert(inner, tostring(ik)) end
+            table.sort(inner)
+            print(string.format("  %s = <table> keys=[%s]", tostring(k), table.concat(inner, ", ")))
+        elseif vt == "string" then
+            print(string.format("  %s = \"%s\"", tostring(k), v))
+        else
+            print(string.format("  %s = <%s> %s", tostring(k), vt, tostring(v)))
+        end
+    end
+    print("}")
+end
+
+
+
+
+-- === BEGIN: userdata-aware name resolution ===
+
+-- Try reading a field off tables *or* userdata safely
+local function probeField(obj, field)
+    return pcall(function() return obj[field] end)
+end
+
+-- Try calling a method (colon syntax) on tables *or* userdata safely
+local function probeMethod(obj, method)
+    return pcall(function() return obj[method](obj) end)
+end
+
+local function classToPretty(s)
+    if type(s) ~= "string" then return nil end
+    s = s:gsub("^BP[_%-]?ItemDesc[_%-]?", "")
+         :gsub("^Desc[_%-]?", "")
+         :gsub("_C$", "")
+         :gsub("(%l)(%u)", "%1 %2")
+         :gsub("_", " ")
+         :gsub("%s+", " ")
+    s = s:gsub("(%a)(%w*)", function(a,b) return string.upper(a)..string.lower(b) end)
+    return s
+end
+
+-- Reads common descriptor holders from a stack or descriptor-like object
+local function resolveDescriptorName(desc)
+    if not desc then return nil end
+
+    -- 1) Direct string-ish identifiers
+    local fields = { "itemName","name","displayName","desc","descriptorName","className","prefabName","prototype" }
+    for _,f in ipairs(fields) do
+        local ok, v = probeField(desc, f)
+        if ok and type(v) == "string" and v ~= "" then
+            return classToPretty(v) or v
+        end
+    end
+
+    -- 2) Try methods that return text
+    local methodsText = { "getDisplayName","getName" }
+    for _,m in ipairs(methodsText) do
+        local ok, v = probeMethod(desc, m)
+        if ok and type(v) == "string" and v ~= "" then return v end
+    end
+
+    -- 3) Try :getType() -> stringify class (often "Desc_IronPlate_C")
+    local okT, typ = probeMethod(desc, "getType")
+    if okT and typ ~= nil then
+        local s = tostring(typ)
+        if type(s) == "string" and s ~= "" then
+            local pretty = classToPretty(s)
+            if pretty and pretty ~= "" then return pretty end
+        end
+        -- sometimes the type object has a name field too
+        local flds2 = { "internalName","name","className" }
+        for _,f in ipairs(flds2) do
+            local ok2, v2 = probeField(typ, f)
+            if ok2 and type(v2) == "string" and v2 ~= "" then
+                return classToPretty(v2) or v2
+            end
+        end
+    end
+
+    return nil
+end
+
+-- NEW: userdata-aware getStackName
+local function getStackName(stack)
+    if not stack then return nil end
+
+    -- A) Direct readable fields on the ItemStack itself
+    local direct = resolveDescriptorName(stack)
+    if direct then return direct end
+
+    -- B) Look for a descriptor-like child on the ItemStack (works for userdata too)
+    local holders = { "item","descriptor","itemDescriptor","type","class","desc" }
+    for _,h in ipairs(holders) do
+        local ok, child = probeField(stack, h)
+        if ok and child ~= nil then
+            local name = resolveDescriptorName(child)
+            if name then return name end
+        end
+    end
+
+    -- C) As a last resort, try getType on the stack itself
+    local okT, typ = probeMethod(stack, "getType")
+    if okT and typ ~= nil then
+        local s = tostring(typ)
+        if type(s) == "string" and s ~= "" then
+            local pretty = classToPretty(s)
+            if pretty and pretty ~= "" then return pretty end
+        end
+    end
+
+    return "UnknownItem"
+end
+
+-- === END: userdata-aware name resolution ===
+
+
+
+
+
+-- ===== FIND CONTAINERS =====
+local containerIDs = component.findComponent(classes.FGBuildableStorage)
+local containers = component.proxy(containerIDs) or {}
+if ONLY_NETWORKED then
+    local filtered = {}
+    for _, c in ipairs(containers) do
+        if c.isNetworkComponent == true then table.insert(filtered, c) end
+    end
+    containers = filtered
+end
+
+-- ===== SCAN =====
+local grandTotal, scanned = 0, 0
+local itemTotals = {}
+local forced = 0
+local forcedPrintedHeader = false
+
+if PRINT_PER_CONTAINER then print("=== Container Summaries ===") end
+
+for idx, c in ipairs(containers) do
+    local inv = safeFirstInventory(c)
+    if inv ~= nil then
+        scanned = scanned + 1
+        local size = getInvSize(inv)
+        local containerItemCount = 0
+        local matchedThisContainer = (SEARCH_TERM == nil)
+
+        if PRINT_PER_SLOT then print(("-- Container #%d --"):format(idx)) end
+
+        for slot = 0, size - 1 do
+            local it = getInvStack(inv, slot)
+            if it and it.count and it.count > 0 then
+                -- FORCE INSPECT a few stacks so we can see structure
+                if forced < FORCE_INSPECT_FIRST_N then
+                    if not forcedPrintedHeader then
+                        print("[Inspect] Dumping first "..FORCE_INSPECT_FIRST_N.." non-empty stacks to learn shape:")
+                        forcedPrintedHeader = true
+                    end
+                    print(string.format("[Inspect] Container #%d, slot %d, count=%s", idx, slot, tostring(it.count)))
+                    dumpTop("stack", it)
+                    -- show common nested holders if present
+                    if type(it.item) == "table" or type(it.item) == "string" then dumpTop("stack.item", it.item) end
+                    if type(it.type) == "table" or type(it.type) == "string" then dumpTop("stack.type", it.type) end
+                    if type(it.descriptor) == "table" or type(it.descriptor) == "string" then dumpTop("stack.descriptor", it.descriptor) end
+                    if type(it.itemDescriptor) == "table" or type(it.itemDescriptor) == "string" then dumpTop("stack.itemDescriptor", it.itemDescriptor) end
+                    if type(it.desc) == "table" or type(it.desc) == "string" then dumpTop("stack.desc", it.desc) end
+                    -- try showing :getType() on likely nodes
+                    local candidates = { it, it.item, it.type, it.descriptor, it.itemDescriptor, it.desc }
+                    for _, obj in ipairs(candidates) do
+                        if type(obj) == "table" and obj.getType then
+                            local ok, cls = pcall(function() return obj:getType() end)
+                            if ok and cls then
+                                print("  -> getType(): "..tostring(cls))
+                            end
+                        end
+                    end
+                    forced = forced + 1
+                end
+
+                local name = getStackName(it) or "UnknownItem"
+                local cnt  = it.count or 0
+                if matchesSearch(name) then
+                    matchedThisContainer = true
+                    itemTotals[name] = (itemTotals[name] or 0) + cnt
+                    containerItemCount = containerItemCount + cnt
+                    if PRINT_PER_SLOT then
+                        print(string.format("  [%3d]  %-32s  x %s", slot, name, fmt(cnt)))
+                    end
+                end
+            end
+        end
+
+        if PRINT_PER_CONTAINER and matchedThisContainer then
+            local used = 0; pcall(function() used = countUsedSlots(inv) end)
+            print(string.format(
+                "Container #%d  | slots used: %d/%d | items: %s",
+                idx, used, size, fmt(containerItemCount)
+            ))
+        end
+
+        grandTotal = grandTotal + containerItemCount
+    end
+end
+
+-- ===== OUTPUT =====
+print("")
+print(("Scanned %d container(s)."):format(scanned))
+if SEARCH_TERM and SEARCH_TERM ~= "" then
+    print(("Filter: item name contains \"%s\""):format(SEARCH_TERM))
+end
+print(("Grand Total Items: %s"):format(fmt(grandTotal)))
+
+local totalsArray = {}
+for name, cnt in pairs(itemTotals) do
+    table.insert(totalsArray, { name = name, count = cnt })
+end
+table.sort(totalsArray, function(a, b)
+    if a.count == b.count then return a.name < b.name else return a.count > b.count end
+end)
+
+if #totalsArray > 0 then
+    print("\n=== Totals by Item Type ===")
+    for _, row in ipairs(totalsArray) do
+        print(string.format("%-40s %12s", row.name, fmt(row.count)))
+    end
+else
+    print("\n(No matching items found or containers empty.)")
+end
