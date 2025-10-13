@@ -1,0 +1,24 @@
+R = 1
+G = .5
+B = .1
+A = 1
+restartrate = 5
+
+
+pole = component.proxy(component.findComponent(classes.IndicatorPole))[1]
+
+
+print("test11")
+
+ while true do
+    event.pull(restartrate)
+    
+    
+    if pole then
+    pole:setColor(R, G, B, A)
+else
+    end
+    
+
+    computer.reset()
+        end
