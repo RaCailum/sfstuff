@@ -452,7 +452,14 @@ gpu:setText(0,8,"reSAM 7: " .. tostring(math.floor(resam7.productivity * 100)) .
 gpu:setText(0,9,"reSAM 8: " .. tostring(math.floor(resam8.productivity * 100)) .. "%")
 gpu:setText(0,10,"reSAM 9: " .. tostring(math.floor(resam9.productivity * 100)) .. "%")
 gpu:setText(0,11,"reSAM 10: " .. tostring(math.floor(resam10.productivity * 100)) .. "%")
-gpu:setText(0,13,"Total reSAM Efficiency: " .. math.floor((tostring(resam1.productivity) + tostring(resam2.productivity) + tostring(resam3.productivity) + tostring(resam4.productivity) + tostring(resam5.productivity) + tostring(resam6.productivity) + tostring(resam7.productivity) + tostring(resam8.productivity) + tostring(resam9.productivity)  + tostring(resam10.productivity)) *100/10) .. "%")
+gpu:setText(0,13,
+    "Total reSAM Efficiency: " ..
+    math.floor(
+        (resam1.productivity + resam2.productivity + resam3.productivity +
+         resam4.productivity + resam5.productivity + resam6.productivity +
+         resam7.productivity + resam8.productivity + resam9.productivity +
+         resam10.productivity) * 100 / 10
+    ) .. "%")
 
 
 
