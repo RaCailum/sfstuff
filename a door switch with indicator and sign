@@ -1,0 +1,41 @@
+door = component.proxy("A2F03BC14921F4369B4E9EAAD0AF5228")
+
+
+-- PANEL 1
+panel = component.proxy("A7864EF749F459BB8E1CBD82FE712F2A")
+	switch = panel:getModule(0, 0)
+	indicator = panel:getModule(0, 2)
+
+-- PANEL 2
+displayboard = component.proxy("5E6E166F4EE81500D895E0A05AE2C320")
+	displayscreen = displayboard:getModule(0, 0)
+
+-- Function to handle switch state changes
+function handleSwitch()
+    if switch.state == false then
+        door:setConfiguration(2)
+        DoorState = "Unlocked"
+        indicator:setColor(0,1,0,1)
+		displayscreen.size = 67
+        displayscreen.text = "UNLOCKED"
+    else
+        door:setConfiguration(1)
+        DoorState = "Locked"
+		indicator:setColor(1,0,0,1)
+		displayscreen.size = 95
+        displayscreen.text = "LOCKED"
+    end
+    print("Door is currently: " .. DoorState)
+end
+
+-- Initial state check
+handleSwitch()
+
+-- Main loop with a shorter check interval
+while true do
+    if switch.state ~= lastState then
+        lastState = switch.state
+        handleSwitch()
+    end
+    computer.millis(50) -- Small delay to prevent excessive CPU usage
+end
