@@ -1,0 +1,44 @@
+-- SEND
+
+messagepackage = "Forza was heeeere!"
+port = 100
+
+local net = computer.getPCIDevices(classes.NetworkCard)[1]  -- grab the first network card
+net:open(port)  -- opening isn’t strictly needed for outgoing messages, but harmless
+
+while true do
+net:broadcast(100, messagepackage)  -- send whatever is in messagepackage on whatever port you put
+print("Sent " .. messagepackage .. " on port " .. port)
+sleep(5)
+end
+
+
+
+
+-- RECEIVE
+
+local net = computer.getPCIDevices(classes.NetworkCard)[1]
+
+event.ignoreAll()    -- stop listening to anything else
+event.listen(net)    -- register the network card for signals:contentReference[oaicite:7]{index=7}
+
+net:open(100)        -- open the port so messages can arrive
+
+while true do
+    local evt, localAddr, remoteAddr, port, payload = event.pull(5, "NetworkMessage")
+    if evt then
+    
+ 
+		print("")
+		print("")
+		print("")
+    	print("**************************")
+        print("New Message Received")
+        print("Sent by " .. tostring(remoteAddr))
+        print("Via port: " .. port)
+        print(tostring(payload))
+       	print("**************************")
+		print("")
+		print("")
+    end
+end
